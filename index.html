@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Synsite — Websites That Define Your Digital Identity</title>
+  <meta name="description"
+    content="Synsite designs and builds high-performance websites tailored for your business growth. Get your free SynPreview™ demo today." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700;800&family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400..700;1,400..700&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="/src/style.css">
+</head>
+
+<body>
+
+  <!-- WebGL Burning Reveal Canvas -->
+  <canvas id="burn-canvas" aria-hidden="true"></canvas>
+
+  <!-- Scroll Progress Bar -->
+  <div id="scroll-progress" aria-hidden="true"></div>
+
+  <!-- Custom Cursor -->
+  <div id="cursor-dot" aria-hidden="true"></div>
+  <div id="cursor-ring" aria-hidden="true"></div>
+
+  <!-- ░░ BACKGROUND ░░ -->
+  <div class="bg" aria-hidden="true">
+    <div class="bg__orb bg__orb--purple"></div>
+    <div class="bg__orb bg__orb--violet"></div>
+    <div class="bg__orb bg__orb--cyan"></div>
+    <div class="bg__grid"></div>
+  </div>
+
+
+  <!-- ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+       NAV
+  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ -->
+  <header class="nav" id="nav">
+    <div class="nav__wrap container">
+      <a href="#" class="logo logo--img">
+        <img src="/logo.png" alt="Synsite — Powered by Synsites" class="logo__img" />
+      </a>
+
+      <nav class="nav__menu" aria-label="Main">
+        <a href="#process" class="nav__link">Process</a>
+        <a href="#services" class="nav__link">Services</a>
+        <a href="/quote.html" class="nav__link">Demo</a>
+        <a href="#why" class="nav__link">Why Us</a>
+        <a href="/payment.html" class="nav__link">Pricing</a>
+      </nav>
+
+      <a href="/quote.html" class="btn btn--sm btn--ghost">Free Demo</a>
+      <a href="/payment.html" class="btn btn--sm btn--outline-glow">Pricing 💳</a>
+
+      <!-- Hamburger (hidden on desktop) -->
+      <button class="nav__hamburger" id="nav-hamburger" aria-label="Open menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Mobile fullscreen drawer -->
+  <div class="nav__mobile-drawer" id="nav-drawer" aria-hidden="true">
+    <nav class="nav__mobile-menu">
+      <a href="#process" class="nav__mobile-link" data-drawer-close>Process</a>
+      <a href="#services" class="nav__mobile-link" data-drawer-close>Services</a>
+      <a href="/quote.html" class="nav__mobile-link" data-drawer-close>Demo</a>
+      <a href="#why" class="nav__mobile-link" data-drawer-close>Why Us</a>
+      <a href="/payment.html" class="nav__mobile-link" data-drawer-close>Pricing</a>
+    </nav>
+    <div style="display:flex;gap:1rem;">
+      <a href="/quote.html" class="btn btn--primary">Get Free Demo</a>
+      <a href="/payment.html" class="btn btn--ghost">View Pricing</a>
+    </div>
+  </div>
+
+  <main>
+
+    <!-- ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+         HERO
+    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ -->
+    <section class="hero" id="hero">
+      <div class="container hero__grid">
+
+        <!-- Left -->
+        <div class="hero__left" data-reveal>
+          <div class="badge">
+            <span class="badge__dot"></span>
+            Premium Digital Agency
+          </div>
+
+          <h1 class="hero__h1">
+            Websites That
+            <span style="display:block;">
+              <span class="grad" id="typewriter-target"><span class="calligraphic">Define</span> Your Digital Identity.</span><span
+                class="typewriter-cursor" aria-hidden="true"></span>
+            </span>
+          </h1>
+
+          <p class="hero__sub">
+            We design, build and deliver high-performance websites tailored for your business growth — fast, secure, and
+            stunning.
+          </p>
+
+          <div class="hero__btns">
+            <a href="/quote.html" class="btn btn--primary">
+              Get Free Demo
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                  stroke-linejoin="round" />
+              </svg>
+            </a>
+            <a href="#process" class="btn btn--ghost">See How It Works</a>
+          </div>
+
+          <!-- Trust bar -->
+          <div class="trust-bar">
+            <div class="trust-bar__item">
+              <span class="trust-bar__num">50+</span>
+              <span class="trust-bar__lbl">Projects</span>
+            </div>
+            <div class="trust-bar__sep"></div>
+            <div class="trust-bar__item">
+              <span class="trust-bar__num">3–5d</span>
+              <span class="trust-bar__lbl">Demo Delivery</span>
+            </div>
+            <div class="trust-bar__sep"></div>
+            <div class="trust-bar__item">
+              <span class="trust-bar__num">100%</span>
+              <span class="trust-bar__lbl">Satisfaction</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right — 3D Browser Mockup -->
+        <div class="hero__right" data-reveal data-reveal-delay="150">
+          <div class="mockup">
+            <!-- Glow ring behind -->
+            <div class="mockup__glow" aria-hidden="true"></div>
+
+            <div class="mockup__window glass-dark">
+              <div class="mockup__bar">
+                <div class="mockup__dots">
+                  <span class="mdot mdot--r"></span>
+                  <span class="mdot mdot--y"></span>
+                  <span class="mdot mdot--g"></span>
+                </div>
+                <div class="mockup__url">
+                  <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                    <circle cx="5" cy="5" r="4" stroke="#555" stroke-width="1" />
+                  </svg>
+                  synsite.com
+                </div>
+              </div>
+
+              <div class="mockup__body">
+                <!-- Fake nav -->
+                <div class="mk-nav">
+                  <div class="mk-logo"></div>
+                  <div class="mk-links">
+                    <div class="mk-link"></div>
+                    <div class="mk-link"></div>
+                    <div class="mk-link"></div>
+                  </div>
+                </div>
+                <!-- Fake hero -->
+                <div class="mk-hero">
+                  <div class="mk-h1"></div>
+                  <div class="mk-h2"></div>
+                  <div class="mk-btn-row">
+                    <div class="mk-btn mk-btn--primary"></div>
+                    <div class="mk-btn"></div>
+                  </div>
+                </div>
+                <!-- Fake cards -->
+                <div class="mk-cards">
+                  <div class="mk-card"></div>
+                  <div class="mk-card"></div>
+                  <div class="mk-card"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Floating stat chips -->
+            <div class="stat-chip stat-chip--1 glass">
+              <span class="stat-chip__icon">🚀</span>
+              <div>
+                <div class="stat-chip__val">+45%</div>
+                <div class="stat-chip__lbl">Conversion</div>
+              </div>
+            </div>
+            <div class="stat-chip stat-chip--2 glass">
+              <span class="stat-chip__icon">⚡</span>
+              <div>
+                <div class="stat-chip__val">0.8s</div>
+                <div class="stat-chip__lbl">Load Time</div>
+              </div>
+            </div>
+            <div class="stat-chip stat-chip--3 glass">
+              <span class="stat-chip__icon">💎</span>
+              <div>
+                <div class="stat-chip__val">Premium</div>
+                <div class="stat-chip__lbl">Design</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+         PROCESS
+    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ -->
+    <section class="sec" id="process">
+      <div class="container">
+
+        <div class="sec__head" data-reveal>
+          <div class="badge">Process</div>
+          <h2>Your Journey to a<br><span class="grad"><span class="calligraphic">Perfect</span> Website</span></h2>
+          <p>From idea to launch in 4 clear steps.</p>
+        </div>
+
+        <div class="process-grid">
+          <div class="process-card glass-card" data-reveal>
+            <div class="process-card__num">01</div>
+            <h3>Fill the Form</h3>
+            <p>Tell us about your business, goals, and vision. Takes less than 3 minutes.</p>
+          </div>
+
+          <div class="process-card glass-card" data-reveal data-reveal-delay="100">
+            <div class="process-card__num">02</div>
+            <h3>We Connect</h3>
+            <p>Our team reaches out within 48 hours to discuss your project in detail.</p>
+          </div>
+
+          <div class="process-card process-card--glow glass-card" data-reveal data-reveal-delay="200">
+            <div class="process-card__crown">⭐ Featured</div>
+            <div class="process-card__num">03</div>
+            <h3>SynPreview™</h3>
+            <p>We build a custom homepage demo for your brand — completely free.</p>
+          </div>
+
+          <div class="process-card glass-card" data-reveal data-reveal-delay="300">
+            <div class="process-card__num">04</div>
+            <h3>Launch & Scale</h3>
+            <p>After your approval, we develop and deploy the full site.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+         TECH TICKER / STACK BAR
+    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ -->
+    <div class="ticker-sec">
+      <div class="ticker-track">
+        <!-- Set 1 -->
+        <span class="ticker-item"><span>⚛️</span> React</span><span class="ticker-sep"></span>
+        <span class="ticker-item"><span>🟢</span> Node.js</span><span class="ticker-sep"></span>
+        <span class="ticker-item"><span>▲</span> Next.js</span><span class="ticker-sep"></span>
+        <span class="ticker-item"><span>🔷</span> TypeScript</span><span class="ticker-sep"></span>
+        <span class="ticker-item"><span>🌊</span> Tailwind CSS</span><span class="ticker-sep"></span>
+        <span class="ticker-item"><span>🍃</span> MongoDB</span><span class="ticker-sep"></span>
+        <span class="ticker-item"><span>🐘</span> PostgreSQL</span><span class="ticker-sep"></span>
+        <span class="ticker-item"><span>☁️</span> AWS / GCP</span><span class="ticker-sep"></span>
+        <span class="ticker-item"><span>🐋</span> Docker</span><span class="ticker-sep"></span>
+        <span class="ticker-item"><span>🔒</span> SSL / HTTPS</span><span class="ticker-sep"></span>
+        <span class="ticker-item"><span>📊</span> Analytics</span><span class="ticker-sep"></span>
+        <span class="ticker-item"><span>🤖</span> AI Integration</span><span class="ticker-sep"></span>
+        <!-- Set 2 (duplicate for seamless loop) -->
+        <span class="ticker-item"><span>⚛️</span> React</span><span class="ticker-sep"></span>
+        <span class="ticker-item"><span>🟢</span> Node.js</span><span class="ticker-sep"></span>
+        <span class="ticker-item"><span>▲</span> Next.js</span><span class="ticker-sep"></span>
+        <span class="ticker-item"><span>🔷</span> TypeScript</span><span class="ticker-sep"></span>
+        <span class="ticker-item"><span>🌊</span> Tailwind CSS</span><span class="ticker-sep"></span>
+        <span class="ticker-item"><span>🍃</span> MongoDB</span><span class="ticker-sep"></span>
+        <span class="ticker-item"><span>🐘</span> PostgreSQL</span><span class="ticker-sep"></span>
+        <span class="ticker-item"><span>☁️</span> AWS / GCP</span><span class="ticker-sep"></span>
+        <span class="ticker-item"><span>🐋</span> Docker</span><span class="ticker-sep"></span>
+        <span class="ticker-item"><span>🔒</span> SSL / HTTPS</span><span class="ticker-sep"></span>
+        <span class="ticker-item"><span>📊</span> Analytics</span><span class="ticker-sep"></span>
+        <span class="ticker-item"><span>🤖</span> AI Integration</span><span class="ticker-sep"></span>
+      </div>
+    </div>
+
+    <!-- ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+         SERVICES
+    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ -->
+    <section class="sec sec--alt" id="services">
+      <div class="container">
+
+        <div class="sec__head" data-reveal>
+          <div class="badge">Services</div>
+          <h2>Everything You Need<br><span class="grad"><span class="calligraphic">Under</span> One Roof</span></h2>
+        </div>
+
+        <div class="svc-grid">
+          <div class="svc-card glass-card" data-reveal>
+            <div class="svc-card__icon">💻</div>
+            <h3>Custom Development</h3>
+            <p>Tailor-made websites built from scratch with clean, scalable code.</p>
+            <div class="svc-card__arrow">→</div>
+          </div>
+          <div class="svc-card glass-card" data-reveal data-reveal-delay="80">
+            <div class="svc-card__icon">🛍️</div>
+            <h3>E-Commerce</h3>
+            <p>High-converting online stores with seamless checkout experiences.</p>
+            <div class="svc-card__arrow">→</div>
+          </div>
+          <div class="svc-card glass-card" data-reveal data-reveal-delay="160">
+            <div class="svc-card__icon">🎨</div>
+            <h3>UI/UX Design</h3>
+            <p>Beautiful, intuitive interfaces that users love and trust.</p>
+            <div class="svc-card__arrow">→</div>
+          </div>
+          <div class="svc-card glass-card" data-reveal data-reveal-delay="240">
+            <div class="svc-card__icon">🚀</div>
+            <h3>Landing Pages</h3>
+            <p>Conversion-focused pages optimized for your marketing campaigns.</p>
+            <div class="svc-card__arrow">→</div>
+          </div>
+          <div class="svc-card glass-card" data-reveal data-reveal-delay="320">
+            <div class="svc-card__icon">🔄</div>
+            <h3>Website Redesign</h3>
+            <p>Modernize your existing site with a fresh, premium look.</p>
+            <div class="svc-card__arrow">→</div>
+          </div>
+          <div class="svc-card glass-card" data-reveal data-reveal-delay="400">
+            <div class="svc-card__icon">🛡️</div>
+            <h3>Maintenance</h3>
+            <p>Ongoing support, updates, and security monitoring.</p>
+            <div class="svc-card__arrow">→</div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+         GET A QUOTE / DEMO CTA
+    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ -->
+    <section class="sec" id="demo">
+      <div class="container">
+        <div class="sec__head" data-reveal>
+          <div class="badge"><span class="badge__dot"></span>Free Demo</div>
+          <h2>Let's Build Something<br><span class="grad"><span class="calligraphic">Extraordinary</span> Together</span></h2>
+          <p>Tell us about your project and get a personalised quote from our team within 24 hours — zero commitment,
+            completely free.</p>
+        </div>
+
+        <div class="demo-cta-grid" data-reveal data-reveal-delay="100">
+
+          <div class="demo-cta-card glass-card">
+            <div class="demo-cta-card__icon">🚀</div>
+            <h3>Custom Quote</h3>
+            <p>Walk us through your vision — project type, budget, timeline — and we'll craft a tailored quote just for
+              you.</p>
+            <ul class="checklist" style="margin: 1.25rem 0;">
+              <li class="checklist__item"><span class="checklist__icon">✓</span> 4-step guided form</li>
+              <li class="checklist__item"><span class="checklist__icon">✓</span> Quote in 24 hours</li>
+              <li class="checklist__item"><span class="checklist__icon">✓</span> Zero commitment</li>
+            </ul>
+            <a href="/quote.html" class="btn btn--primary btn--full btn--lg">
+              Get My Free Quote
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                  stroke-linejoin="round" />
+              </svg>
+            </a>
+          </div>
+
+          <div class="demo-cta-card glass-card">
+            <div class="demo-cta-card__icon">💬</div>
+            <h3>Talk to Us Directly</h3>
+            <p>Prefer a quick chat? Reach us on WhatsApp or email — we respond within a few hours and love talking
+              ideas.</p>
+            <ul class="checklist" style="margin: 1.25rem 0;">
+              <li class="checklist__item"><span class="checklist__icon">✓</span> Real humans, not bots</li>
+              <li class="checklist__item"><span class="checklist__icon">✓</span> Fast response</li>
+              <li class="checklist__item"><span class="checklist__icon">✓</span> Free consultation</li>
+            </ul>
+            <div style="display:flex;flex-direction:column;gap:0.75rem;">
+              <a href="https://wa.me/919876543210" target="_blank" class="btn btn--primary btn--full">
+                💬 WhatsApp Us
+              </a>
+              <a href="mailto:hello@synsite.com" class="btn btn--ghost btn--full">
+                ✉️ hello@synsite.com
+              </a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+         TESTIMONIALS
+    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ -->
+    <section class="testimonials-sec">
+      <div class="testimonials-sec__head">
+        <div class="badge">Client Love</div>
+        <h2 style="font-size:clamp(1.8rem,3vw,2.8rem);letter-spacing:-0.04em;margin-bottom:0;">What Our Clients <span
+            class="grad"><span class="calligraphic">Say</span> About Us</span></h2>
+      </div>
+      <div class="testimonials-track">
+        <!-- Set 1 -->
+        <div class="testi-card">
+          <div class="testi-card__stars">⭐⭐⭐⭐⭐</div>
+          <p class="testi-card__quote">"Synsite delivered our e-commerce platform in just 12 days. The design is
+            stunning and conversions jumped 60% in the first month. Genuinely impressed."</p>
+          <div class="testi-card__author">
+            <div class="testi-card__avatar">RK</div>
+            <div>
+              <div class="testi-card__name">Rahul Khanna</div>
+              <div class="testi-card__role">CEO, FreshMart India</div>
+            </div>
+          </div>
+        </div>
+        <div class="testi-card">
+          <div class="testi-card__stars">⭐⭐⭐⭐⭐</div>
+          <p class="testi-card__quote">"The SynPreview™ demo blew my mind — a fully custom homepage delivered free in 4
+            days. We signed on immediately. The full site is even better."</p>
+          <div class="testi-card__author">
+            <div class="testi-card__avatar" style="background:linear-gradient(135deg,#22d3ee,#8b5cf6);">PS</div>
+            <div>
+              <div class="testi-card__name">Priya Sharma</div>
+              <div class="testi-card__role">Founder, StyleHub</div>
+            </div>
+          </div>
+        </div>
+        <div class="testi-card">
+          <div class="testi-card__stars">⭐⭐⭐⭐⭐</div>
+          <p class="testi-card__quote">"We needed a professional portfolio fast. Synsite built something that genuinely
+            represents our brand — premium, fast, and SEO-optimised from day one."</p>
+          <div class="testi-card__author">
+            <div class="testi-card__avatar" style="background:linear-gradient(135deg,#e879f9,#7c3aed);">AM</div>
+            <div>
+              <div class="testi-card__name">Arjun Menon</div>
+              <div class="testi-card__role">Creative Director, Arcvision</div>
+            </div>
+          </div>
+        </div>
+        <div class="testi-card">
+          <div class="testi-card__stars">⭐⭐⭐⭐⭐</div>
+          <p class="testi-card__quote">"Migrated our old WordPress site to a blazing-fast custom platform. Load time
+            went from 5s to under 0.9s. Clients are thrilled."</p>
+          <div class="testi-card__author">
+            <div class="testi-card__avatar" style="background:linear-gradient(135deg,#7c3aed,#22d3ee);">NK</div>
+            <div>
+              <div class="testi-card__name">Neha Kulkarni</div>
+              <div class="testi-card__role">CTO, TechBridge</div>
+            </div>
+          </div>
+        </div>
+        <div class="testi-card">
+          <div class="testi-card__stars">⭐⭐⭐⭐⭐</div>
+          <p class="testi-card__quote">"The team's communication was flawless throughout. They understood our vision
+            perfectly and the end result exceeded all expectations."</p>
+          <div class="testi-card__author">
+            <div class="testi-card__avatar" style="background:linear-gradient(135deg,#fbbf24,#e879f9);">VS</div>
+            <div>
+              <div class="testi-card__name">Vikram Singh</div>
+              <div class="testi-card__role">MD, Velox Logistics</div>
+            </div>
+          </div>
+        </div>
+        <!-- Set 2 (duplicate for seamless marquee) -->
+        <div class="testi-card">
+          <div class="testi-card__stars">⭐⭐⭐⭐⭐</div>
+          <p class="testi-card__quote">"Synsite delivered our e-commerce platform in just 12 days. The design is
+            stunning and conversions jumped 60% in the first month. Genuinely impressed."</p>
+          <div class="testi-card__author">
+            <div class="testi-card__avatar">RK</div>
+            <div>
+              <div class="testi-card__name">Rahul Khanna</div>
+              <div class="testi-card__role">CEO, FreshMart India</div>
+            </div>
+          </div>
+        </div>
+        <div class="testi-card">
+          <div class="testi-card__stars">⭐⭐⭐⭐⭐</div>
+          <p class="testi-card__quote">"The SynPreview™ demo blew my mind — a fully custom homepage delivered free in 4
+            days. We signed on immediately. The full site is even better."</p>
+          <div class="testi-card__author">
+            <div class="testi-card__avatar" style="background:linear-gradient(135deg,#22d3ee,#8b5cf6);">PS</div>
+            <div>
+              <div class="testi-card__name">Priya Sharma</div>
+              <div class="testi-card__role">Founder, StyleHub</div>
+            </div>
+          </div>
+        </div>
+        <div class="testi-card">
+          <div class="testi-card__stars">⭐⭐⭐⭐⭐</div>
+          <p class="testi-card__quote">"We needed a professional portfolio fast. Synsite built something that genuinely
+            represents our brand — premium, fast, and SEO-optimised from day one."</p>
+          <div class="testi-card__author">
+            <div class="testi-card__avatar" style="background:linear-gradient(135deg,#e879f9,#7c3aed);">AM</div>
+            <div>
+              <div class="testi-card__name">Arjun Menon</div>
+              <div class="testi-card__role">Creative Director, Arcvision</div>
+            </div>
+          </div>
+        </div>
+        <div class="testi-card">
+          <div class="testi-card__stars">⭐⭐⭐⭐⭐</div>
+          <p class="testi-card__quote">"The team's communication was flawless throughout. They understood our vision
+            perfectly and the end result exceeded all expectations."</p>
+          <div class="testi-card__author">
+            <div class="testi-card__avatar" style="background:linear-gradient(135deg,#fbbf24,#e879f9);">VS</div>
+            <div>
+              <div class="testi-card__name">Vikram Singh</div>
+              <div class="testi-card__role">MD, Velox Logistics</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+         WHY SYNSITE — METRICS
+    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ -->
+    <section class="sec sec--alt" id="why">
+      <div class="container">
+
+        <div class="sec__head" data-reveal>
+          <div class="badge">Why Synsite</div>
+          <h2>Built for Results,<br><span class="grad"><span class="calligraphic">Not Just</span> Looks</span></h2>
+          <p>Every site we build is engineered for speed, security, and conversions.</p>
+        </div>
+
+        <div class="metrics-row">
+          <div class="metric-card glass-card" data-reveal>
+            <div class="metric-card__icon">⚡</div>
+            <div class="metric-card__num grad">3–5</div>
+            <div class="metric-card__label">Day Demo Delivery</div>
+          </div>
+          <div class="metric-card glass-card" data-reveal data-reveal-delay="100">
+            <div class="metric-card__icon">🚀</div>
+            <div class="metric-card__num grad">&lt;2s</div>
+            <div class="metric-card__label">Target Load Time</div>
+          </div>
+          <div class="metric-card glass-card" data-reveal data-reveal-delay="200">
+            <div class="metric-card__icon">📱</div>
+            <div class="metric-card__num grad">100%</div>
+            <div class="metric-card__label">Responsive Design</div>
+          </div>
+          <div class="metric-card glass-card" data-reveal data-reveal-delay="300">
+            <div class="metric-card__icon">🔒</div>
+            <div class="metric-card__num grad">24/7</div>
+            <div class="metric-card__label">Ongoing Support</div>
+          </div>
+        </div>
+
+        <!-- Feature list -->
+        <div class="features-grid" data-reveal>
+          <div class="feature">
+            <span class="feature__icon">✦</span>
+            <div>
+              <strong>Synsites-Backed Innovation</strong>
+              <p>Powered by cutting-edge technology from the Synsites ecosystem.</p>
+            </div>
+          </div>
+          <div class="feature">
+            <span class="feature__icon">✦</span>
+            <div>
+              <strong>SEO-First Architecture</strong>
+              <p>Every site is built with structured data and performance in mind.</p>
+            </div>
+          </div>
+          <div class="feature">
+            <span class="feature__icon">✦</span>
+            <div>
+              <strong>Secure & Scalable Code</strong>
+              <p>Production-grade code that grows with your business.</p>
+            </div>
+          </div>
+          <div class="feature">
+            <span class="feature__icon">✦</span>
+            <div>
+              <strong>Custom CRM Integration</strong>
+              <p>Connect your site to your sales pipeline from day one.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+         PRICING TEASER
+    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ -->
+    <section class="sec pricing-sec">
+      <div class="container">
+        <div class="pricing-banner glass-card" data-reveal>
+          <div class="pricing-banner__left">
+            <div class="badge">Pricing</div>
+            <h2>Premium Quality,<br><span class="grad"><span class="calligraphic">Honest</span> Pricing</span></h2>
+            <p>Starting from <strong class="price-highlight">₹25,000</strong> for business websites. No hidden fees.</p>
+          </div>
+          <div class="pricing-banner__right">
+            <a href="/payment.html" class="btn btn--primary btn--lg" id="get-quote-btn">
+              View Pricing &amp; Pay
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                  stroke-linejoin="round" />
+              </svg>
+            </a>
+            <a href="/quote.html" class="btn btn--ghost">
+              Get Custom Quote
+            </a>
+            <p class="pricing-note">Secure payment via Razorpay · GST Invoice included</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+       FOOTER
+  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ -->
+   <footer class="footer">
+    <div class="footer__watermark" aria-hidden="true">SYNSITES</div>
+    <div class="container">
+      <div class="footer__top">
+        <div class="footer__brand">
+          <a href="#" class="logo">Synsite<span class="logo__dot">.</span></a>
+          <p style="margin-top:0.5rem;">Powered by Synsites</p>
+          <p class="footer__tagline">Websites That Define Your Digital Identity.</p>
+          <!-- Social links -->
+          <div style="display:flex;gap:0.75rem;margin-top:1.5rem;flex-wrap:wrap;">
+            <a href="#"
+              style="width:38px;height:38px;border-radius:50%;background:rgba(139,92,246,0.12);border:1px solid rgba(167,139,250,0.25);display:flex;align-items:center;justify-content:center;font-size:1rem;transition:background 0.2s,transform 0.2s;"
+              onmouseover="this.style.background='rgba(139,92,246,0.3)';this.style.transform='translateY(-3px)';"
+              onmouseout="this.style.background='rgba(139,92,246,0.12)';this.style.transform='';">𝕏</a>
+            <a href="#"
+              style="width:38px;height:38px;border-radius:50%;background:rgba(139,92,246,0.12);border:1px solid rgba(167,139,250,0.25);display:flex;align-items:center;justify-content:center;font-size:1rem;transition:background 0.2s,transform 0.2s;"
+              onmouseover="this.style.background='rgba(34,211,238,0.2)';this.style.transform='translateY(-3px)';"
+              onmouseout="this.style.background='rgba(139,92,246,0.12)';this.style.transform='';">in</a>
+            <a href="#"
+              style="width:38px;height:38px;border-radius:50%;background:rgba(139,92,246,0.12);border:1px solid rgba(167,139,250,0.25);display:flex;align-items:center;justify-content:center;font-size:1rem;transition:background 0.2s,transform 0.2s;"
+              onmouseover="this.style.background='rgba(232,121,249,0.2)';this.style.transform='translateY(-3px)';"
+              onmouseout="this.style.background='rgba(139,92,246,0.12)';this.style.transform='';">📸</a>
+            <a href="https://wa.me/919876543210" target="_blank"
+              style="width:38px;height:38px;border-radius:50%;background:rgba(139,92,246,0.12);border:1px solid rgba(167,139,250,0.25);display:flex;align-items:center;justify-content:center;font-size:1rem;transition:background 0.2s,transform 0.2s;"
+              onmouseover="this.style.background='rgba(34,197,94,0.2)';this.style.transform='translateY(-3px)';"
+              onmouseout="this.style.background='rgba(139,92,246,0.12)';this.style.transform='';">💬</a>
+          </div>
+        </div>
+
+        <div class="footer__cols">
+          <div class="footer__col">
+            <h4>Company</h4>
+            <a href="#process">Process</a>
+            <a href="#services">Services</a>
+            <a href="#why">Why Us</a>
+            <a href="#demo">Get Demo</a>
+          </div>
+          <div class="footer__col">
+            <h4>Services</h4>
+            <a href="#">Custom Development</a>
+            <a href="#">E-Commerce</a>
+            <a href="#">UI/UX Design</a>
+            <a href="#">Maintenance</a>
+          </div>
+          <div class="footer__col">
+            <h4>Connect</h4>
+            <a href="#">Twitter / X</a>
+            <a href="#">LinkedIn</a>
+            <a href="#">Instagram</a>
+            <a href="https://wa.me/919876543210" target="_blank">WhatsApp</a>
+            <a href="mailto:hello@synsite.com">hello@synsite.com</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer CTA band -->
+      <div
+        style="text-align:center;padding:3rem 0 4rem;border-top:1px solid rgba(167,139,250,0.08);border-bottom:1px solid rgba(167,139,250,0.08);margin-bottom:2.5rem;">
+        <p
+          style="font-family:var(--f-display);font-size:clamp(1.5rem,3vw,2.5rem);font-weight:900;letter-spacing:-0.04em;color:var(--c-white);margin-bottom:1.5rem;">
+          Ready to build something <span class="grad"><span class="calligraphic">extraordinary?</span></span></p>
+        <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
+          <a href="/quote.html" class="btn btn--primary btn--lg">Get Free Demo <svg width="16" height="16"
+              viewBox="0 0 16 16" fill="none">
+              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                stroke-linejoin="round" />
+            </svg></a>
+          <a href="/payment.html" class="btn btn--ghost btn--lg">View Pricing</a>
+        </div>
+      </div>
+
+      <div class="footer__bottom">
+        <p>© 2026 Synsite. All rights reserved. Powered by Synsites.</p>
+        <div class="footer__legal">
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms of Service</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+
+</html>

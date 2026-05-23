@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Client Portal — Synsite</title>
+    <meta name="description" content="Securely log in to your Synsite client portal to view dues and make payments." />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700;800&family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400..700;1,400..700&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/src/style.css">
+    <link rel="stylesheet" href="/src/payment.css">
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+
+<body class="payment-page">
+
+    <div id="scroll-progress" aria-hidden="true"></div>
+    <div id="cursor-dot" aria-hidden="true"></div>
+    <div id="cursor-ring" aria-hidden="true"></div>
+
+    <!-- Background -->
+    <div class="bg" aria-hidden="true">
+        <div class="bg__orb bg__orb--purple"></div>
+        <div class="bg__orb bg__orb--violet"></div>
+        <div class="bg__orb bg__orb--cyan"></div>
+        <div class="bg__grid"></div>
+    </div>
+
+    <!-- Nav -->
+    <header class="nav" id="nav">
+        <div class="nav__wrap container">
+            <a href="/" class="logo logo--img">
+                <img src="/logo.png" alt="Synsite" class="logo__img" />
+            </a>
+            <a href="/" class="btn btn--sm btn--ghost">← Back to Home</a>
+        </div>
+    </header>
+
+    <main class="pay-portal-main">
+        <div class="pay-portal-wrap">
+
+            <!-- ── LEFT: Branding / Info ── -->
+            <div class="pay-portal-left" data-reveal>
+                <div class="pay-portal-brand">
+                    <div class="pay-portal-logo">Synsite<span class="logo__dot">.</span></div>
+                    <p class="pay-portal-tagline">Client Payment Portal</p>
+                </div>
+
+                <div class="pay-portal-info">
+                    <h1 class="pay-portal-h1">Manage &amp; Pay<br><span class="grad">Your Invoices</span></h1>
+                    <p>Log in with your Client ID and password to view your outstanding dues and make secure payments.
+                    </p>
+                </div>
+
+                <div class="pay-trust-list">
+                    <div class="pay-trust-item">
+                        <span class="pay-trust-icon">🔒</span>
+                        <span>256-bit SSL Encrypted</span>
+                    </div>
+                    <div class="pay-trust-item">
+                        <span class="pay-trust-icon">📄</span>
+                        <span>GST Invoice on every payment</span>
+                    </div>
+                    <div class="pay-trust-item">
+                        <span class="pay-trust-icon">⚡</span>
+                        <span>UPI · Cards · Net Banking · Wallets</span>
+                    </div>
+                    <div class="pay-trust-item">
+                        <span class="pay-trust-icon">💬</span>
+                        <span>Need help? WhatsApp +91 98765 43210</span>
+                    </div>
+                </div>
+
+                <div class="pay-portal-powered">
+                    <span>Secured by</span>
+                    <strong>Razorpay</strong>
+                </div>
+            </div>
+
+            <!-- ── RIGHT: Steps ── -->
+            <div class="pay-portal-right" data-reveal data-reveal-delay="150">
+                <div class="pay-portal-card glass-card" id="pay-portal-card">
+
+                    <!-- ── STEP 0: Client Login ── -->
+                    <div class="pstep active" id="pstep-0">
+                        <div class="pstep__head">
+                            <div class="pstep__badge">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                    <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 11a4 4 0 100-8 4 4 0 000 8z"
+                                        stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                                </svg>
+                                Client Login
+                            </div>
+                            <h2>Welcome Back</h2>
+                            <p>Enter your Client ID and password to access your account</p>
+                        </div>
+
+                        <div class="fld">
+                            <label for="client-id">
+                                Client ID
+                                <span class="fld__hint">e.g. SYN-001</span>
+                            </label>
+                            <div class="fld__icon-wrap">
+                                <svg class="fld__icon" width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                    <rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor"
+                                        stroke-width="1.5" />
+                                    <path d="M7 11V7a5 5 0 0110 0v4" stroke="currentColor" stroke-width="1.5"
+                                        stroke-linecap="round" />
+                                </svg>
+                                <input type="text" id="client-id" placeholder="SYN-001" autocomplete="off" />
+                            </div>
+                        </div>
+
+                        <div class="fld">
+                            <label for="client-pass">
+                                Password
+                            </label>
+                            <div class="fld__icon-wrap">
+                                <svg class="fld__icon" width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                    <path
+                                        d="M12 17a2 2 0 100-4 2 2 0 000 4zM12 13V7M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"
+                                        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                                </svg>
+                                <input type="password" id="client-pass" placeholder="Enter your password" />
+                                <button type="button" class="fld__toggle-pass" id="toggle-pass"
+                                    title="Show/hide password">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" id="eye-icon">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor"
+                                            stroke-width="1.5" />
+                                        <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.5" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="login-error" id="login-error" hidden>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5" />
+                                <path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="1.5"
+                                    stroke-linecap="round" />
+                            </svg>
+                            <span id="login-error-msg">Invalid Client ID or password.</span>
+                        </div>
+
+                        <button class="btn btn--primary btn--full btn--lg" id="login-btn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M15 12H3"
+                                    stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                            </svg>
+                            Log In to My Account
+                        </button>
+
+                        <p class="form-note" style="margin-top:1rem;">
+                            Don't have a Client ID? <a href="/#demo"
+                                style="color:var(--c-purple-4);text-decoration:underline;">Request a free demo</a> to
+                            get started.
+                        </p>
+                    </div>
+
+                    <!-- ── STEP 1: Account Overview / Dues ── -->
+                    <div class="pstep" id="pstep-1">
+                        <div class="client-welcome-bar" id="client-welcome-bar">
+                            <div class="client-avatar" id="client-avatar">R</div>
+                            <div>
+                                <div class="client-name" id="client-name">Rahul Mehta</div>
+                                <div class="client-id-badge" id="client-id-disp">SYN-001</div>
+                            </div>
+                            <button class="btn btn--sm btn--ghost" id="logout-btn"
+                                style="margin-left:auto;">Logout</button>
+                        </div>
+
+                        <div class="pstep__head" style="padding-top:0;border-top:none;">
+                            <h2>Your Account</h2>
+                            <p>Review your outstanding dues below</p>
+                        </div>
+
+                        <!-- Invoice Cards -->
+                        <div class="invoice-list" id="invoice-list">
+                            <!-- Filled by JS -->
+                        </div>
+
+                        <!-- Total Due -->
+                        <div class="total-due-row" id="total-due-row">
+                            <span>Total Outstanding</span>
+                            <span class="total-due-amt" id="total-due-amt">₹0</span>
+                        </div>
+
+                        <button class="btn btn--primary btn--full btn--lg" id="proceed-to-pay-btn">
+                            Proceed to Pay
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- ── STEP 2: Confirm & Pay ── -->
+                    <div class="pstep" id="pstep-2">
+                        <div class="inv-summary-banner" id="inv-summary-banner">
+                            <div class="inv-summary-banner__left">
+                                <div class="inv-badge" id="s2-inv-num">SYN-2024-0001</div>
+                                <div class="inv-desc-text" id="s2-inv-desc">Website Development</div>
+                            </div>
+                            <div class="inv-summary-banner__right">
+                                <div class="inv-total-label">Total Payable</div>
+                                <div class="inv-total-amount" id="s2-total">₹0</div>
+                            </div>
+                        </div>
+
+                        <div class="pstep__head" style="padding-top:0;border-top:none;">
+                            <h2>Confirm &amp; Pay</h2>
+                            <p>Payment will be processed via Razorpay</p>
+                        </div>
+
+                        <!-- Amount breakdown -->
+                        <div class="amount-preview" id="amount-preview" style="display:block;">
+                            <div class="amt-row"><span>Base Amount</span><span id="amt-base">₹0</span></div>
+                            <div class="amt-row"><span>GST @ 18%</span><span id="amt-gst">₹0</span></div>
+                            <div class="amt-row amt-row--total"><span>Total Payable</span><span id="amt-total">₹0</span>
+                            </div>
+                        </div>
+
+                        <div class="fld">
+                            <label for="cust-email">Email Address <span style="color:#f87171">*</span></label>
+                            <input type="email" id="cust-email" placeholder="john@example.com" required />
+                        </div>
+                        <div class="fld">
+                            <label for="cust-phone">Phone / WhatsApp <span style="color:#f87171">*</span></label>
+                            <input type="tel" id="cust-phone" placeholder="+91 98765 43210" required />
+                        </div>
+
+                        <div class="pstep__nav">
+                            <button class="btn btn--ghost" id="back-to-1">← Back</button>
+                            <button class="btn btn--primary btn--lg" id="pay-now-btn">
+                                <span id="pay-btn-label">Pay ₹0 Now</span>
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                    <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5"
+                                        stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                            </button>
+                        </div>
+                        <p style="text-align:center;font-size:0.72rem;color:var(--c-gray-3);margin-top:0.6rem;">
+                            🔒 Secured by Razorpay · 256-bit SSL
+                        </p>
+                    </div>
+
+                    <!-- ── STEP 3: Success ── -->
+                    <div class="pstep pay-success-step" id="pstep-success">
+                        <div class="pay-success__anim">
+                            <div class="pay-success__ring"></div>
+                            <div class="pay-success__check">✓</div>
+                        </div>
+                        <h2>Payment Received!</h2>
+                        <p>Thank you — your payment has been confirmed. Our team will reach out within <strong>2
+                                hours</strong>.</p>
+                        <div class="pay-success__details" id="success-details"></div>
+                        <div class="pay-success__actions">
+                            <button class="btn btn--primary" id="dl-receipt-btn">📥 Download Receipt</button>
+                            <a href="/" class="btn btn--ghost">Back to Home</a>
+                        </div>
+                    </div>
+
+                </div><!-- end card -->
+
+                <!-- Payment methods row -->
+                <div class="pay-methods-row">
+                    <span>We accept:</span>
+                    <div class="pay-method-icons">
+                        <span class="pay-method">UPI</span>
+                        <span class="pay-method">Visa</span>
+                        <span class="pay-method">Mastercard</span>
+                        <span class="pay-method">RuPay</span>
+                        <span class="pay-method">Net Banking</span>
+                        <span class="pay-method">EMI</span>
+                    </div>
+                </div>
+            </div><!-- end right -->
+
+        </div>
+    </main>
+
+    <script type="module" src="/src/payment.js"></script>
+
+</body>
+
+</html>
