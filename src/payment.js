@@ -33,7 +33,7 @@ const CLIENTS = {
         email: 'rahul@nexgen.com',
         phone: '+91 98765 43210',
         invoices: [
-            { ref: 'INV-2024-0042', description: 'Website Development — Phase 1', amount: 25000, gst: true, status: 'due' },
+            { ref: 'INV-2024-0042', description: 'Website Development — Phase 1', amount: 10000, gst: true, status: 'due' },
             { ref: 'INV-2024-0051', description: 'Monthly Maintenance — March', amount: 3500, gst: true, status: 'due' },
         ],
     },

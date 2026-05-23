@@ -27,7 +27,7 @@ Which service are you most interested in?`,
     {
         patterns: ['price', 'pricing', 'cost', 'how much', 'charge', 'fee', 'rate', 'plan', 'package', 'rupee', '₹'],
         reply: `Our pricing is transparent and competitive 💳<br><br>
-<strong>🌱 Starter</strong> — ₹25,000 · Business website, up to 5 pages<br>
+<strong>🌱 Starter</strong> — ₹10,000 · Business website, up to 5 pages<br>
 <strong>⚡ Growth</strong> — ₹45,000 · Advanced site + contact forms + SEO<br>
 <strong>🏆 Pro</strong> — ₹75,000 · E-commerce or complex web app<br>
 <strong>🔒 Maintenance</strong> — ₹3,500/mo · Updates, backups & support<br><br>
