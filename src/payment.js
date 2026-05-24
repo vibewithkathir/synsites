@@ -28,6 +28,24 @@ function getNextMonth15Date() {
     return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' });
 }
 
+function getInvoiceStatus(clientId, invoiceRef, defaultStatus) {
+    const paidList = localStorage.getItem(`client_paid_${clientId}`);
+    if (paidList) {
+        const parsed = JSON.parse(paidList);
+        if (parsed.includes(invoiceRef)) return 'paid';
+    }
+    return defaultStatus;
+}
+
+function setInvoicePaid(clientId, invoiceRef) {
+    const paidListStr = localStorage.getItem(`client_paid_${clientId}`) || '[]';
+    const parsed = JSON.parse(paidListStr);
+    if (!parsed.includes(invoiceRef)) {
+        parsed.push(invoiceRef);
+    }
+    localStorage.setItem(`client_paid_${clientId}`, JSON.stringify(parsed));
+}
+
 /* ══════════════════════════════════════════════════════════
    CLIENT DATABASE (add/edit clients here)
    Each client has: id, password, name, company, email, phone
@@ -151,6 +169,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         /* ── Successful login ── */
         currentClient = { ...client, id };
+        // Sync invoice status with localStorage
+        currentClient.invoices.forEach(inv => {
+            inv.status = getInvoiceStatus(id, inv.ref, inv.status);
+        });
         loginBtn.textContent = 'Logging in…';
         loginBtn.disabled = true;
 
@@ -262,6 +284,7 @@ document.addEventListener('DOMContentLoaded', () => {
             description: `Full Payment — ${dueInvoices.length} invoice(s)`,
             amount: totalBase,
             gst: hasAnyGst,
+            isCombined: true,
         };
         selectedInvoice = combined;
         buildConfirmStep(combined);
@@ -371,7 +394,10 @@ document.addEventListener('DOMContentLoaded', () => {
     function markInvoicePaid() {
         if (!currentClient || !selectedInvoice) return;
         currentClient.invoices.forEach(inv => {
-            if (inv.ref === selectedInvoice.ref) inv.status = 'paid';
+            if (selectedInvoice.isCombined || inv.ref === selectedInvoice.ref) {
+                inv.status = 'paid';
+                setInvoicePaid(currentClient.id, inv.ref);
+            }
         });
     }
 
