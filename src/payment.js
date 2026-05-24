@@ -20,47 +20,42 @@ const CONFIG = {
     theme: '#7c3aed',
 };
 
+/* ── Helpers ─────────────────────────────────────────────── */
+function getNextMonth15Date() {
+    const d = new Date();
+    d.setMonth(d.getMonth() + 1);
+    d.setDate(15);
+    return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' });
+}
+
 /* ══════════════════════════════════════════════════════════
    CLIENT DATABASE (add/edit clients here)
    Each client has: id, password, name, company, email, phone
-   and an array of invoices with: ref, description, amount, gst, status
+   and an array of invoices with: ref, description, amount, gst, status, dueDate
    ══════════════════════════════════════════════════════════ */
 const CLIENTS = {
+    'SYN-000': {
+        password: 'synsites-000',
+        name: 'Kathir M',
+        company: 'Synsites LLC',
+        email: 'kathir@synsites.com',
+        phone: '+91 98765 43210',
+        invoices: [
+            { ref: 'INV-2026-0001', description: 'Demo Site Setup Dues', amount: 50, gst: false, status: 'due', dueDate: getNextMonth15Date() },
+        ],
+    },
     'SYN-001': {
-        password: 'client@001',
+        password: 'synsites-001',
         name: 'Rahul Mehta',
         company: 'NexGen Ventures',
         email: 'rahul@nexgen.com',
         phone: '+91 98765 43210',
         invoices: [
-            { ref: 'INV-2024-0042', description: 'Website Development — Phase 1', amount: 10000, gst: true, status: 'due' },
-            { ref: 'INV-2024-0051', description: 'Monthly Maintenance — March', amount: 3500, gst: true, status: 'due' },
-        ],
-    },
-    'SYN-002': {
-        password: 'synite456',
-        name: 'Priya Sharma',
-        company: 'StartupX',
-        email: 'priya@startupx.in',
-        phone: '+91 91234 56789',
-        invoices: [
-            { ref: 'INV-2024-0038', description: 'Landing Page Design', amount: 15000, gst: true, status: 'due' },
-        ],
-    },
-    'SYN-003': {
-        password: 'demo@2024',
-        name: 'Arjun Patel',
-        company: 'GrowthCo',
-        email: 'arjun@growthco.io',
-        phone: '+91 80000 12345',
-        invoices: [
-            { ref: 'INV-2024-0060', description: 'E-Commerce Platform — Full Build', amount: 75000, gst: true, status: 'due' },
-            { ref: 'INV-2024-0061', description: 'SEO Setup & Configuration', amount: 8000, gst: true, status: 'due' },
+            { ref: 'INV-2026-0042', description: 'Website Development — Balance Payment', amount: 5000, gst: false, status: 'due', dueDate: getNextMonth15Date() },
         ],
     },
 };
 
-/* ── Helpers ─────────────────────────────────────────────── */
 function fmt(n) {
     return '₹' + new Intl.NumberFormat('en-IN').format(n);
 }
@@ -145,7 +140,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!pass) { clientPassInput.classList.add('error'); showLoginError('Please enter your password.'); return; }
 
         const client = CLIENTS[id];
-        if (!client || client.password !== pass) {
+        const storedPassword = localStorage.getItem(`client_pass_${id}`) || (client ? client.password : null);
+        if (!client || storedPassword !== pass) {
             clientIdInput.classList.add('error');
             clientPassInput.classList.add('error');
             showLoginError('Incorrect Client ID or password. Please try again.');
@@ -190,6 +186,16 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('client-id-disp').textContent = currentClient.id;
         document.getElementById('client-avatar').textContent = currentClient.name.charAt(0).toUpperCase();
 
+        /* Reset Change Password form state */
+        const pwForm = document.getElementById('pw-form-container');
+        if (pwForm) pwForm.style.display = 'none';
+        const newPw = document.getElementById('new-pw');
+        const newPwConfirm = document.getElementById('new-pw-confirm');
+        if (newPw) newPw.value = '';
+        if (newPwConfirm) newPwConfirm.value = '';
+        const statusMsg = document.getElementById('pw-status-msg');
+        if (statusMsg) { statusMsg.hidden = true; statusMsg.textContent = ''; }
+
         /* Invoice list */
         const list = document.getElementById('invoice-list');
         list.innerHTML = '';
@@ -197,7 +203,8 @@ document.addEventListener('DOMContentLoaded', () => {
         let totalDue = 0;
 
         currentClient.invoices.forEach((inv, idx) => {
-            const total = withGST(inv.amount);
+            const gst = inv.gst ? gstOf(inv.amount) : 0;
+            const total = inv.amount + gst;
             totalDue += total;
 
             const card = document.createElement('div');
@@ -207,8 +214,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="invoice-item__left">
                     <div class="invoice-item__ref">${inv.ref}</div>
                     <div class="invoice-item__desc">${inv.description}</div>
+                    ${inv.dueDate ? `<div class="invoice-item__due-date" style="color: var(--c-purple-4); font-size: 0.78rem; font-weight: 600; margin-top: 4px;">📅 Due: ${inv.dueDate}</div>` : ''}
                     <div class="invoice-item__breakdown">
-                        Base ${fmt(inv.amount)} + GST ${fmt(gstOf(inv.amount))}
+                        Base ${fmt(inv.amount)} ${inv.gst ? `+ GST ${fmt(gst)}` : '(No GST)'}
                     </div>
                 </div>
                 <div class="invoice-item__right">
@@ -248,11 +256,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (dueInvoices.length === 0) { showToast('No outstanding invoices!'); return; }
 
         const totalBase = dueInvoices.reduce((s, i) => s + i.amount, 0);
+        const hasAnyGst = dueInvoices.some(i => i.gst);
         const combined = {
             ref: currentClient.id,
             description: `Full Payment — ${dueInvoices.length} invoice(s)`,
             amount: totalBase,
-            gst: true,
+            gst: hasAnyGst,
         };
         selectedInvoice = combined;
         buildConfirmStep(combined);
@@ -460,5 +469,72 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.appendChild(m);
         m.addEventListener('click', e => { if (e.target === m) m.remove(); });
     }
+
+    /* ── Change Password UI Logic ─── */
+    const togglePwBtn = document.getElementById('toggle-pw-form-btn');
+    const pwContainer = document.getElementById('pw-form-container');
+    const savePwBtn = document.getElementById('save-pw-btn');
+    const cancelPwBtn = document.getElementById('cancel-pw-btn');
+    const newPwInput = document.getElementById('new-pw');
+    const newPwConfirmInput = document.getElementById('new-pw-confirm');
+    const pwStatusMsg = document.getElementById('pw-status-msg');
+
+    const showPwStatus = (msg, success = false) => {
+        if (!pwStatusMsg) return;
+        pwStatusMsg.textContent = msg;
+        pwStatusMsg.style.color = success ? '#86efac' : '#fca5a5';
+        pwStatusMsg.hidden = false;
+        setTimeout(() => { pwStatusMsg.hidden = true; }, 3500);
+    };
+
+    togglePwBtn?.addEventListener('click', () => {
+        if (!pwContainer) return;
+        const isHidden = pwContainer.style.display === 'none';
+        pwContainer.style.display = isHidden ? 'block' : 'none';
+        if (isHidden) {
+            newPwInput?.focus();
+        }
+    });
+
+    cancelPwBtn?.addEventListener('click', () => {
+        if (pwContainer) pwContainer.style.display = 'none';
+        if (newPwInput) newPwInput.value = '';
+        if (newPwConfirmInput) newPwConfirmInput.value = '';
+    });
+
+    savePwBtn?.addEventListener('click', () => {
+        if (!currentClient) return;
+        const newPass = newPwInput?.value.trim();
+        const newPassConfirm = newPwConfirmInput?.value.trim();
+
+        if (!newPass) {
+            showPwStatus('Please enter a new password.', false);
+            return;
+        }
+        if (newPass.length < 4) {
+            showPwStatus('Password must be at least 4 characters.', false);
+            return;
+        }
+        if (newPass !== newPassConfirm) {
+            showPwStatus('Passwords do not match.', false);
+            return;
+        }
+
+        // Save password locally
+        localStorage.setItem(`client_pass_${currentClient.id}`, newPass);
+        currentClient.password = newPass;
+        if (CLIENTS[currentClient.id]) {
+            CLIENTS[currentClient.id].password = newPass;
+        }
+
+        showPwStatus('Password updated successfully! ✓', true);
+        showToast('Password updated successfully.', 'success');
+
+        setTimeout(() => {
+            if (pwContainer) pwContainer.style.display = 'none';
+            if (newPwInput) newPwInput.value = '';
+            if (newPwConfirmInput) newPwConfirmInput.value = '';
+        }, 1000);
+    });
 
 });

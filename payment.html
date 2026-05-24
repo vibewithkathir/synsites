@@ -197,6 +197,28 @@
                                     stroke-linecap="round" stroke-linejoin="round" />
                             </svg>
                         </button>
+
+                        <!-- Change Password Section -->
+                        <div class="change-pw-sec" style="margin-top: 1.25rem; padding-top: 1.25rem; border-top: 1px dashed rgba(245, 245, 220, 0.15);">
+                            <button class="btn btn--sm btn--ghost" id="toggle-pw-form-btn" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                                🔑 Change Password
+                            </button>
+                            <div id="pw-form-container" style="display: none; margin-top: 1rem; text-align: left;">
+                                <div class="fld" style="margin-bottom: 0.75rem;">
+                                    <label for="new-pw" style="font-size: 0.78rem;">New Password</label>
+                                    <input type="password" id="new-pw" placeholder="Enter new password" style="padding: 8px 12px; font-size: 0.85rem;" />
+                                </div>
+                                <div class="fld" style="margin-bottom: 1rem;">
+                                    <label for="new-pw-confirm" style="font-size: 0.78rem;">Confirm New Password</label>
+                                    <input type="password" id="new-pw-confirm" placeholder="Confirm new password" style="padding: 8px 12px; font-size: 0.85rem;" />
+                                </div>
+                                <div style="display: flex; gap: 8px;">
+                                    <button class="btn btn--sm btn--primary" id="save-pw-btn" style="flex: 1;">Save Password</button>
+                                    <button class="btn btn--sm btn--ghost" id="cancel-pw-btn">Cancel</button>
+                                </div>
+                                <div id="pw-status-msg" style="margin-top: 0.5rem; font-size: 0.78rem; text-align: center;" hidden></div>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- ── STEP 2: Confirm & Pay ── -->
