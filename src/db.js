@@ -1,3 +1,17 @@
+import { ConvexClient } from "convex/browser";
+
+const CONVEX_URL = import.meta.env.VITE_CONVEX_URL;
+let convexClient = null;
+
+if (CONVEX_URL) {
+    try {
+        convexClient = new ConvexClient(CONVEX_URL);
+        console.log("Convex client initialized successfully.");
+    } catch (e) {
+        console.error("Failed to initialize Convex client:", e);
+    }
+}
+
 export function getNextMonth15Date() {
     const d = new Date();
     d.setMonth(d.getMonth() + 1);
@@ -72,6 +86,59 @@ export function saveClient(id, clientData) {
     }
     stored[id] = clientData;
     localStorage.setItem(DYNAMIC_CLIENTS_KEY, JSON.stringify(stored));
+
+    if (convexClient) {
+        convexClient.mutation("clients:save", {
+            clientId: id,
+            password: clientData.password || "",
+            name: clientData.name || "",
+            company: clientData.company || "",
+            email: clientData.email || "",
+            phone: clientData.phone || "",
+            description: clientData.description || "",
+            invoices: clientData.invoices || [],
+        }).then(() => {
+            console.log("Client successfully saved to Convex:", id);
+        }).catch(err => {
+            console.error("Failed to save client to Convex:", err);
+        });
+    }
+}
+
+export async function syncConvex() {
+    if (!convexClient) return;
+    try {
+        const list = await convexClient.query("clients:list");
+        if (list.length === 0) {
+            const defaultsArray = Object.keys(DEFAULT_CLIENTS).map(id => ({
+                clientId: id,
+                ...DEFAULT_CLIENTS[id]
+            }));
+            await convexClient.mutation("clients:seed", { clients: defaultsArray });
+            console.log("Seeded default clients to Convex.");
+        }
+
+        const freshClients = await convexClient.query("clients:list");
+        if (freshClients && freshClients.length > 0) {
+            const cache = {};
+            freshClients.forEach(c => {
+                const { _id, _creationTime, ...clientData } = c;
+                cache[c.clientId] = clientData;
+                if (clientData.password) {
+                    localStorage.setItem(`client_pass_${c.clientId}`, clientData.password);
+                }
+            });
+            localStorage.setItem(DYNAMIC_CLIENTS_KEY, JSON.stringify(cache));
+            console.log("Synced local cache with Convex database.");
+            
+            const activeId = localStorage.getItem('synsite_active_client_id');
+            if (activeId) {
+                initGlobalProfileMenu(true);
+            }
+        }
+    } catch (e) {
+        console.error("Convex sync failed:", e);
+    }
 }
 export function loadTheme() {
     const theme = localStorage.getItem('synsite_theme');
@@ -90,6 +157,10 @@ export function toggleGlobalTheme() {
 export function initGlobalProfileMenu(forceRefresh = false) {
     // Load theme on start
     loadTheme();
+
+    if (!forceRefresh && convexClient) {
+        syncConvex();
+    }
 
     if (forceRefresh) {
         const existing = document.getElementById('nav-profile-container');

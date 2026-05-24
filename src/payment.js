@@ -434,6 +434,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 setInvoicePaid(currentClient.id, inv.ref);
             }
         });
+        saveClient(currentClient.id, currentClient);
     }
 
     function showSuccessStep({ paymentId, email, total, gst, base, desc, ref }) {
