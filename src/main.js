@@ -1,8 +1,10 @@
 import './style.css';
 import { initChatbot } from './chatbot.js';
+import { initGlobalProfileMenu, loadTheme } from './db.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-  
+  loadTheme();
+  initGlobalProfileMenu();
 
   /* ─── Chatbot ──────────────────────────────────────── */
   initChatbot();

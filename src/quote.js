@@ -1,8 +1,10 @@
 import './style.css';
 import './quote.css';
-import { loadClients, saveClient, getNextMonth15Date } from './db.js';
+import { loadClients, saveClient, getNextMonth15Date, initGlobalProfileMenu, loadTheme } from './db.js';
 
 document.addEventListener('DOMContentLoaded', () => {
+    loadTheme();
+    initGlobalProfileMenu();
 
     /* ─── Scroll Progress Bar ─────────────────────────── */
     const progressBar = document.getElementById('scroll-progress');

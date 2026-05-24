@@ -1,6 +1,6 @@
 import './style.css';
 import './payment.css';
-import { loadClients, saveClient, getNextMonth15Date } from './db.js';
+import { loadClients, saveClient, getNextMonth15Date, initGlobalProfileMenu, loadTheme } from './db.js';
 
 /* ╔══════════════════════════════════════════════════════════╗
    ║           RAZORPAY CONFIGURATION                          ║
@@ -57,6 +57,8 @@ function gstOf(amount) {
    APP INIT
    ══════════════════════════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', () => {
+    loadTheme();
+    initGlobalProfileMenu();
 
     const keyIsSet = RAZORPAY_KEY_ID && !RAZORPAY_KEY_ID.includes('PASTE_YOUR_KEY');
     if (!keyIsSet) showSetupBanner();
@@ -101,6 +103,28 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => {
                 buildAccountView();
                 goToStep('pstep-1');
+                
+                // Process actions from redirect query parameters
+                const urlParams = new URLSearchParams(window.location.search);
+                const action = urlParams.get('action');
+                if (action === 'edit-profile') {
+                    const fields = document.getElementById('profile-fields-container');
+                    if (fields) {
+                        fields.style.display = 'block';
+                        fields.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        const profileArrow = document.getElementById('profile-toggle-arrow');
+                        if (profileArrow) {
+                            profileArrow.textContent = '▲';
+                            profileArrow.style.transform = 'rotate(180deg)';
+                        }
+                    }
+                } else if (action === 'change-password') {
+                    const pwForm = document.getElementById('pw-form-container');
+                    if (pwForm) {
+                        pwForm.style.display = 'block';
+                        pwForm.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }
             }, 100);
         }
     }
@@ -191,10 +215,13 @@ document.addEventListener('DOMContentLoaded', () => {
     function buildAccountView() {
         if (!currentClient) return;
 
-        /* Welcome bar */
-        document.getElementById('client-name').textContent = currentClient.name;
-        document.getElementById('client-id-disp').textContent = currentClient.id;
-        document.getElementById('client-avatar').textContent = currentClient.name.charAt(0).toUpperCase();
+        /* Welcome bar (guarded if welcome bar is commented out) */
+        const clientNameEl = document.getElementById('client-name');
+        if (clientNameEl) clientNameEl.textContent = currentClient.name;
+        const clientIdDispEl = document.getElementById('client-id-disp');
+        if (clientIdDispEl) clientIdDispEl.textContent = currentClient.id;
+        const clientAvatarEl = document.getElementById('client-avatar');
+        if (clientAvatarEl) clientAvatarEl.textContent = currentClient.name.charAt(0).toUpperCase();
 
         /* Populate profile fields */
         const profileNameInput = document.getElementById('profile-name');
@@ -566,6 +593,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         showPwStatus('Password updated successfully! ✓', true);
         showToast('Password updated successfully.', 'success');
+        
+        // Refresh global navbar profile dropdown
+        initGlobalProfileMenu(true);
 
         setTimeout(() => {
             if (pwContainer) pwContainer.style.display = 'none';
@@ -627,9 +657,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         saveClient(currentClient.id, activeClients[currentClient.id]);
 
-        // Refresh welcome bar details
-        document.getElementById('client-name').textContent = newName;
-        document.getElementById('client-avatar').textContent = newName.charAt(0).toUpperCase();
+        // Refresh welcome bar details (if exists)
+        const welcomeName = document.getElementById('client-name');
+        if (welcomeName) welcomeName.textContent = newName;
+        const welcomeAvatar = document.getElementById('client-avatar');
+        if (welcomeAvatar) welcomeAvatar.textContent = newName.charAt(0).toUpperCase();
+
+        // Refresh global navbar profile dropdown
+        initGlobalProfileMenu(true);
 
         showToast('Profile details updated successfully! ✓', 'success');
 
