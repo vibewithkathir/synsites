@@ -9,7 +9,7 @@ import './payment.css';
    ║  Test key format:  rzp_test_XXXXXXXXXXXXXXXX             ║
    ║  Live key format:  rzp_live_XXXXXXXXXXXXXXXX             ║
    ╚══════════════════════════════════════════════════════════╝ */
-const RAZORPAY_KEY_ID = 'rzp_test_PASTE_YOUR_KEY_HERE';
+const RAZORPAY_KEY_ID = 'rzp_test_St5tB4HHy2vWMd';
 
 const CONFIG = {
     companyName: 'Synsite',
