@@ -3701,11 +3701,3 @@ h3 {
   transition: transform 0.1s ease-out;
 }
 
-#burn-canvas {
-  position: fixed;
-  inset: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: 99999;
-  pointer-events: none;
-}
