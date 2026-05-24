@@ -1,5 +1,6 @@
 import './style.css';
 import './payment.css';
+import { loadClients, saveClient, getNextMonth15Date } from './db.js';
 
 /* ╔══════════════════════════════════════════════════════════╗
    ║           RAZORPAY CONFIGURATION                          ║
@@ -21,13 +22,6 @@ const CONFIG = {
 };
 
 /* ── Helpers ─────────────────────────────────────────────── */
-function getNextMonth15Date() {
-    const d = new Date();
-    d.setMonth(d.getMonth() + 1);
-    d.setDate(15);
-    return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' });
-}
-
 function getInvoiceStatus(clientId, invoiceRef, defaultStatus) {
     const paidList = localStorage.getItem(`client_paid_${clientId}`);
     if (paidList) {
@@ -46,33 +40,8 @@ function setInvoicePaid(clientId, invoiceRef) {
     localStorage.setItem(`client_paid_${clientId}`, JSON.stringify(parsed));
 }
 
-/* ══════════════════════════════════════════════════════════
-   CLIENT DATABASE (add/edit clients here)
-   Each client has: id, password, name, company, email, phone
-   and an array of invoices with: ref, description, amount, gst, status, dueDate
-   ══════════════════════════════════════════════════════════ */
-const CLIENTS = {
-    'SYN-000': {
-        password: 'synsites-000',
-        name: 'Kathir M',
-        company: 'Synsites LLC',
-        email: 'kathir@synsites.com',
-        phone: '+91 98765 43210',
-        invoices: [
-            { ref: 'INV-2026-0001', description: 'Demo Site Setup Dues', amount: 50, gst: false, status: 'due', dueDate: getNextMonth15Date() },
-        ],
-    },
-    'SYN-001': {
-        password: 'synsites-001',
-        name: 'Rahul Mehta',
-        company: 'NexGen Ventures',
-        email: 'rahul@nexgen.com',
-        phone: '+91 98765 43210',
-        invoices: [
-            { ref: 'INV-2026-0042', description: 'Website Development — Balance Payment', amount: 5000, gst: false, status: 'due', dueDate: getNextMonth15Date() },
-        ],
-    },
-};
+// Load static & dynamic client registry
+const CLIENTS = loadClients();
 
 function fmt(n) {
     return '₹' + new Intl.NumberFormat('en-IN').format(n);
@@ -119,9 +88,26 @@ document.addEventListener('DOMContentLoaded', () => {
     }, { threshold: 0.08 });
     document.querySelectorAll('[data-reveal]').forEach(el => io.observe(el));
 
+    // Auto-login session persistence check
+    const savedClientId = localStorage.getItem('synsite_active_client_id');
+    if (savedClientId) {
+        const activeClients = loadClients();
+        const client = activeClients[savedClientId];
+        if (client) {
+            currentClient = { ...client, id: savedClientId };
+            currentClient.invoices.forEach(inv => {
+                inv.status = getInvoiceStatus(savedClientId, inv.ref, inv.status);
+            });
+            setTimeout(() => {
+                buildAccountView();
+                goToStep('pstep-1');
+            }, 100);
+        }
+    }
+
     /* ══════════════════════════════════════════════════════
        STEP MANAGER
-    ══════════════════════════════════════════════════════ */
+       ══════════════════════════════════════════════════════ */
     function goToStep(id) {
         document.querySelectorAll('.pstep').forEach(s => s.classList.remove('active'));
         const target = document.getElementById(id);
@@ -157,7 +143,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!id) { clientIdInput.classList.add('error'); showLoginError('Please enter your Client ID.'); return; }
         if (!pass) { clientPassInput.classList.add('error'); showLoginError('Please enter your password.'); return; }
 
-        const client = CLIENTS[id];
+        const activeClients = loadClients();
+        const client = activeClients[id];
         const storedPassword = localStorage.getItem(`client_pass_${id}`) || (client ? client.password : null);
         if (!client || storedPassword !== pass) {
             clientIdInput.classList.add('error');
@@ -173,6 +160,7 @@ document.addEventListener('DOMContentLoaded', () => {
         currentClient.invoices.forEach(inv => {
             inv.status = getInvoiceStatus(id, inv.ref, inv.status);
         });
+        localStorage.setItem('synsite_active_client_id', id);
         loginBtn.textContent = 'Logging in…';
         loginBtn.disabled = true;
 
@@ -207,6 +195,25 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('client-name').textContent = currentClient.name;
         document.getElementById('client-id-disp').textContent = currentClient.id;
         document.getElementById('client-avatar').textContent = currentClient.name.charAt(0).toUpperCase();
+
+        /* Populate profile fields */
+        const profileNameInput = document.getElementById('profile-name');
+        const profileCompanyInput = document.getElementById('profile-company');
+        const profileEmailInput = document.getElementById('profile-email');
+        const profilePhoneInput = document.getElementById('profile-phone');
+        const profileDescInput = document.getElementById('profile-desc');
+
+        if (profileNameInput) profileNameInput.value = currentClient.name || '';
+        if (profileCompanyInput) profileCompanyInput.value = currentClient.company || '';
+        if (profileEmailInput) profileEmailInput.value = currentClient.email || '';
+        if (profilePhoneInput) profilePhoneInput.value = currentClient.phone || '';
+        if (profileDescInput) profileDescInput.value = currentClient.description || '';
+
+        // Collapse profile container on reload/load
+        const profileFields = document.getElementById('profile-fields-container');
+        if (profileFields) profileFields.style.display = 'none';
+        const profileArrow = document.getElementById('profile-toggle-arrow');
+        if (profileArrow) profileArrow.textContent = '▼';
 
         /* Reset Change Password form state */
         const pwForm = document.getElementById('pw-form-container');
@@ -298,6 +305,7 @@ document.addEventListener('DOMContentLoaded', () => {
         clientIdInput.value = '';
         clientPassInput.value = '';
         loginError.hidden = true;
+        localStorage.removeItem('synsite_active_client_id');
         goToStep('pstep-0');
     });
 
@@ -549,8 +557,11 @@ document.addEventListener('DOMContentLoaded', () => {
         // Save password locally
         localStorage.setItem(`client_pass_${currentClient.id}`, newPass);
         currentClient.password = newPass;
-        if (CLIENTS[currentClient.id]) {
-            CLIENTS[currentClient.id].password = newPass;
+        
+        const activeClients = loadClients();
+        if (activeClients[currentClient.id]) {
+            activeClients[currentClient.id].password = newPass;
+            saveClient(currentClient.id, activeClients[currentClient.id]);
         }
 
         showPwStatus('Password updated successfully! ✓', true);
@@ -561,6 +572,74 @@ document.addEventListener('DOMContentLoaded', () => {
             if (newPwInput) newPwInput.value = '';
             if (newPwConfirmInput) newPwConfirmInput.value = '';
         }, 1000);
+    });
+
+    /* ── My Profile UI Logic ─── */
+    const profileHeader = document.getElementById('profile-header');
+    const profileFieldsContainer = document.getElementById('profile-fields-container');
+    const profileArrow = document.getElementById('profile-toggle-arrow');
+    const saveProfileBtn = document.getElementById('save-profile-btn');
+
+    profileHeader?.addEventListener('click', () => {
+        if (!profileFieldsContainer) return;
+        const isHidden = profileFieldsContainer.style.display === 'none';
+        profileFieldsContainer.style.display = isHidden ? 'block' : 'none';
+        if (profileArrow) {
+            profileArrow.textContent = isHidden ? '▲' : '▼';
+            profileArrow.style.transform = isHidden ? 'rotate(180deg)' : '';
+        }
+    });
+
+    saveProfileBtn?.addEventListener('click', () => {
+        if (!currentClient) return;
+
+        const newName = document.getElementById('profile-name')?.value.trim();
+        const newCompany = document.getElementById('profile-company')?.value.trim();
+        const newEmail = document.getElementById('profile-email')?.value.trim();
+        const newPhone = document.getElementById('profile-phone')?.value.trim();
+        const newDesc = document.getElementById('profile-desc')?.value.trim();
+
+        if (!newName || !newCompany || !newEmail) {
+            showToast('Name, Company and Email are required profile fields.', 'error');
+            return;
+        }
+
+        // Update current client reference
+        currentClient.name = newName;
+        currentClient.company = newCompany;
+        currentClient.email = newEmail;
+        currentClient.phone = newPhone;
+        currentClient.description = newDesc;
+
+        // Save to dynamic clients registry
+        const activeClients = loadClients();
+        if (!activeClients[currentClient.id]) {
+            activeClients[currentClient.id] = { invoices: [] };
+        }
+        activeClients[currentClient.id].name = newName;
+        activeClients[currentClient.id].company = newCompany;
+        activeClients[currentClient.id].email = newEmail;
+        activeClients[currentClient.id].phone = newPhone;
+        activeClients[currentClient.id].description = newDesc;
+        // Make sure password stays sync'd
+        const storedPassword = localStorage.getItem(`client_pass_${currentClient.id}`) || currentClient.password;
+        activeClients[currentClient.id].password = storedPassword;
+
+        saveClient(currentClient.id, activeClients[currentClient.id]);
+
+        // Refresh welcome bar details
+        document.getElementById('client-name').textContent = newName;
+        document.getElementById('client-avatar').textContent = newName.charAt(0).toUpperCase();
+
+        showToast('Profile details updated successfully! ✓', 'success');
+
+        setTimeout(() => {
+            if (profileFieldsContainer) profileFieldsContainer.style.display = 'none';
+            if (profileArrow) {
+                profileArrow.textContent = '▼';
+                profileArrow.style.transform = '';
+            }
+        }, 800);
     });
 
 });

@@ -1,5 +1,6 @@
 import './style.css';
 import './quote.css';
+import { loadClients, saveClient, getNextMonth15Date } from './db.js';
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -219,6 +220,42 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        // Dynamic client account registration
+        const clients = loadClients();
+        let nextIndex = 2;
+        while (clients[`SYN-` + String(nextIndex).padStart(3, '0')]) {
+            nextIndex++;
+        }
+        const newId = `SYN-` + String(nextIndex).padStart(3, '0');
+        const newPass = `synsites-` + String(nextIndex).padStart(3, '0');
+
+        const budgetVal = (quoteData.budget || '').toLowerCase();
+        let amount = 10000;
+        if (budgetVal.includes('50k') || budgetVal.includes('growth')) amount = 50000;
+        else if (budgetVal.includes('1.5l') || budgetVal.includes('premium')) amount = 150000;
+        else if (budgetVal.includes('5l') || budgetVal.includes('enterprise')) amount = 500000;
+
+        const newClient = {
+            password: newPass,
+            name: quoteData.name,
+            company: quoteData.company,
+            email: quoteData.email,
+            phone: quoteData.phone || '',
+            description: quoteData.vision || `Request for ${quoteData.projectTypes.map(v => v.replace(/-/g, ' ')).join(', ')} project.`,
+            invoices: [
+                {
+                    ref: `INV-${newId.replace('SYN-', '')}-01`,
+                    description: `${quoteData.projectTypes.map(v => v.charAt(0).toUpperCase() + v.slice(1).replace(/-/g, ' ')).join(', ')} — Setup Payment`,
+                    amount: amount,
+                    gst: false,
+                    status: 'due',
+                    dueDate: getNextMonth15Date()
+                }
+            ]
+        };
+
+        saveClient(newId, newClient);
+
         // Simulate submit
         const btn = document.getElementById('submit-quote');
         btn.textContent = 'Submitting…';
@@ -228,6 +265,11 @@ document.addEventListener('DOMContentLoaded', () => {
         fireParticles(btn);
 
         setTimeout(() => {
+            const idEl = document.getElementById('new-client-id');
+            const passEl = document.getElementById('new-client-pass');
+            if (idEl) idEl.textContent = newId;
+            if (passEl) passEl.textContent = newPass;
+
             document.getElementById(`step-${currentStep}`).classList.remove('active');
             document.getElementById('step-success').classList.add('active');
             updateStepsBar(5); // past all steps
