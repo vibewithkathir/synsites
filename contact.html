@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contact Us — Synsite</title>
+  <meta name="description" content="Get in touch with Synsite. Reach us by email, phone, or message." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700;800&family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/src/style.css">
+  <style>
+    .contact-layout {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 3rem;
+      margin-top: 2rem;
+      margin-bottom: 5rem;
+    }
+    
+    @media (max-width: 968px) {
+      .contact-layout {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+    }
+    
+    .contact-info {
+      padding: 3rem 2.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    
+    .contact-info h1 {
+      font-family: var(--f-display);
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 800;
+      color: var(--c-white);
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.03em;
+    }
+    
+    .contact-info .subtext {
+      color: var(--c-gray-3);
+      font-size: 1.05rem;
+      line-height: 1.6;
+      margin-bottom: 2.5rem;
+    }
+    
+    .info-details {
+      display: flex;
+      flex-direction: column;
+      gap: 1.75rem;
+    }
+    
+    .info-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+    
+    .info-item__icon {
+      font-size: 1.5rem;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(139,92,246,0.12);
+      border: 1px solid rgba(167,139,250,0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    
+    .info-item__text strong {
+      display: block;
+      color: var(--c-white);
+      font-size: 0.95rem;
+      margin-bottom: 0.25rem;
+    }
+    
+    .info-item__text p {
+      color: var(--c-gray-3);
+      font-size: 1rem;
+      margin: 0;
+    }
+    
+    .info-item__text a {
+      color: var(--c-cyan);
+      text-decoration: none;
+      font-weight: 500;
+    }
+    
+    .info-item__text a:hover {
+      text-decoration: underline;
+    }
+    
+    .contact-form-card {
+      padding: 3rem 2.5rem;
+    }
+    
+    .contact-form-card h2 {
+      font-family: var(--f-sans);
+      color: var(--c-white);
+      font-size: 1.5rem;
+      margin-bottom: 1.5rem;
+      font-weight: 700;
+    }
+    
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-group label {
+      display: block;
+      color: var(--c-white);
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    
+    .form-group input, .form-group textarea {
+      width: 100%;
+      padding: 0.85rem 1rem;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.95rem;
+      transition: border-color 0.25s, box-shadow 0.25s;
+    }
+    
+    .form-group input:focus, .form-group textarea:focus {
+      outline: none;
+      border-color: var(--c-purple-3);
+      box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Scroll Progress -->
+  <div id="scroll-progress" aria-hidden="true"></div>
+
+  <!-- Custom Cursor -->
+  <div id="cursor-dot" aria-hidden="true"></div>
+  <div id="cursor-ring" aria-hidden="true"></div>
+
+  <!-- BACKGROUND -->
+  <div class="bg" aria-hidden="true">
+    <div class="bg__orb bg__orb--purple"></div>
+    <div class="bg__orb bg__orb--violet"></div>
+    <div class="bg__orb bg__orb--cyan"></div>
+    <div class="bg__grid"></div>
+  </div>
+
+  <!-- NAV -->
+  <header class="nav" id="nav">
+    <div class="nav__wrap container">
+      <a href="/" class="logo logo--img">
+        <img src="/logo.png" alt="Synsite" class="logo__img" style="height:32px;" />
+      </a>
+      <nav class="nav__menu" aria-label="Main">
+        <a href="/#process" class="nav__link">Process</a>
+        <a href="/#services" class="nav__link">Services</a>
+        <a href="/#why" class="nav__link">Why Us</a>
+        <a href="/payment.html" class="nav__link">Pricing</a>
+      </nav>
+      <a href="/" class="btn btn--sm btn--ghost">← Back to Home</a>
+    </div>
+  </header>
+
+  <main style="padding-top: 100px;">
+    <div class="container">
+      <div class="contact-layout">
+        
+        <!-- Left: Contact Details -->
+        <div class="contact-info glass-card">
+          <div>
+            <h1>Contact Us</h1>
+            <p class="subtext">Have a question or looking to build a new website? Get in touch with our team directly. We are always ready to help.</p>
+            
+            <div class="info-details">
+              <div class="info-item">
+                <span class="info-item__icon">✉️</span>
+                <div class="info-item__text">
+                  <strong>Email Us</strong>
+                  <p><a href="mailto:synalpy@gmail.com">synalpy@gmail.com</a></p>
+                </div>
+              </div>
+              
+              <div class="info-item">
+                <span class="info-item__icon">📞</span>
+                <div class="info-item__text">
+                  <strong>Call / WhatsApp</strong>
+                  <p><a href="tel:+918122228762">+91 81222 28762</a></p>
+                </div>
+              </div>
+              
+              <div class="info-item">
+                <span class="info-item__icon">🏢</span>
+                <div class="info-item__text">
+                  <strong>Merchant Office</strong>
+                  <p>Synsite, Chennai, Tamil Nadu, India</p>
+                </div>
+              </div>
+              
+              <div class="info-item">
+                <span class="info-item__icon">⏰</span>
+                <div class="info-item__text">
+                  <strong>Working Hours</strong>
+                  <p>Mon – Sat: 9:00 AM – 7:00 PM IST</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Right: Contact Form -->
+        <div class="contact-form-card glass-card">
+          <h2>Send us a Message</h2>
+          <form id="demo-form">
+            <div class="form-group">
+              <label for="c-name">Full Name *</label>
+              <input type="text" id="c-name" placeholder="John Doe" required />
+            </div>
+            <div class="form-group">
+              <label for="c-email">Email Address *</label>
+              <input type="email" id="c-email" placeholder="john@example.com" required />
+            </div>
+            <div class="form-group">
+              <label for="c-phone">Phone Number</label>
+              <input type="tel" id="c-phone" placeholder="+91 98765 43210" />
+            </div>
+            <div class="form-group">
+              <label for="c-message">Message *</label>
+              <textarea id="c-message" rows="5" placeholder="How can we help you?" required></textarea>
+            </div>
+            <button type="submit" class="btn btn--primary btn--full btn--lg" id="submit-btn">Send Message</button>
+          </form>
+          
+          <div id="form-success" hidden style="text-align: center; padding: 2rem 0;">
+            <span style="font-size: 3rem; display: block; margin-bottom: 1rem;">🎉</span>
+            <h3 style="color: var(--c-white); font-size: 1.3rem; margin-bottom: 0.5rem; font-weight: 700;">Message Sent!</h3>
+            <p style="color: var(--c-gray-3); font-size: 0.95rem;">Thank you for reaching out. We will get back to you within 2-4 hours.</p>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer-mini">
+    <div class="container">
+      <p>© 2026 Synsite. All rights reserved. Powered by Synsites.</p>
+      <div class="footer__legal">
+        <a href="/privacy.html">Privacy Policy</a>
+        <a href="/terms.html">Terms & Conditions</a>
+        <a href="/refund.html">Refund Policy</a>
+        <a href="/contact.html">Contact Us</a>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
