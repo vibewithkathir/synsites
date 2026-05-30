@@ -10,8 +10,8 @@ import { loadClients, saveClient, getNextMonth15Date, initGlobalProfileMenu, loa
    ║  Test key format:  rzp_test_XXXXXXXXXXXXXXXX             ║
    ║  Live key format:  rzp_live_XXXXXXXXXXXXXXXX             ║
    ╚══════════════════════════════════════════════════════════╝ */
-const RAZORPAY_KEY_ID = import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_St5tB4HHy2vWMd';
-const CONVEX_SITE_URL = import.meta.env.VITE_CONVEX_SITE_URL;
+const RAZORPAY_KEY_ID = import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_Svc7POJLumrDus';
+const CONVEX_SITE_URL = import.meta.env.VITE_CONVEX_SITE_URL || 'https://polite-dove-27.convex.site';
 
 const CONFIG = {
     companyName: 'Synsite',
@@ -287,11 +287,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         /* Welcome bar (guarded if welcome bar is commented out) */
         const clientNameEl = document.getElementById('client-name');
-        if (clientNameEl) clientNameEl.textContent = currentClient.name;
+        if (clientNameEl) clientNameEl.textContent = currentClient.name || 'Client';
         const clientIdDispEl = document.getElementById('client-id-disp');
         if (clientIdDispEl) clientIdDispEl.textContent = currentClient.id;
         const clientAvatarEl = document.getElementById('client-avatar');
-        if (clientAvatarEl) clientAvatarEl.textContent = currentClient.name.charAt(0).toUpperCase();
+        if (clientAvatarEl) {
+            const clientName = currentClient.name || 'Client';
+            clientAvatarEl.textContent = clientName.charAt(0).toUpperCase();
+        }
 
         /* Populate profile fields */
         const profileNameInput = document.getElementById('profile-name');

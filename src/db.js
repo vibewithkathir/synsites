@@ -1,6 +1,6 @@
 import { ConvexClient } from "convex/browser";
 
-const CONVEX_URL = import.meta.env.VITE_CONVEX_URL;
+const CONVEX_URL = import.meta.env.VITE_CONVEX_URL || 'https://polite-dove-27.convex.cloud';
 let convexClient = null;
 
 if (CONVEX_URL) {
