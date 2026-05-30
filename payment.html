@@ -76,9 +76,12 @@
                 </div>
 
                 <div class="pay-portal-powered" style="display: flex; flex-direction: column; align-items: flex-start; gap: 0.75rem;">
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <span>Secured by</span>
-                        <strong>Razorpay</strong>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="color:var(--c-flame);flex-shrink:0">
+                            <path d="M12 2L3 7v5c0 5.25 3.75 10.15 9 11.25C17.25 22.15 21 17.25 21 12V7L12 2z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="rgba(255,120,0,0.12)"/>
+                            <path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span style="font-size:0.8rem;">100% Secure · Powered by <strong style="color:#00baf2">Razorpay</strong></span>
                     </div>
                     <!-- Legal links for Razorpay compliance -->
                     <div style="display: flex; gap: 0.75rem; font-size: 0.75rem; opacity: 0.8; flex-wrap: wrap; margin-top: 0.25rem;">
@@ -95,6 +98,25 @@
 
             <!-- ── RIGHT: Steps ── -->
             <div class="pay-portal-right" data-reveal data-reveal-delay="150">
+
+                <!-- Step Progress Indicator -->
+                <div class="pay-stepper" id="pay-stepper">
+                    <div class="pay-stepper__item active" id="step-dot-0">
+                        <div class="pay-stepper__dot">1</div>
+                        <span>Login</span>
+                    </div>
+                    <div class="pay-stepper__line"></div>
+                    <div class="pay-stepper__item" id="step-dot-1">
+                        <div class="pay-stepper__dot">2</div>
+                        <span>Account</span>
+                    </div>
+                    <div class="pay-stepper__line"></div>
+                    <div class="pay-stepper__item" id="step-dot-2">
+                        <div class="pay-stepper__dot">3</div>
+                        <span>Pay</span>
+                    </div>
+                </div>
+
                 <div class="pay-portal-card glass-card" id="pay-portal-card">
 
                     <!-- ── STEP 0: Client Login ── -->
@@ -230,6 +252,13 @@
                         <!-- Invoice Cards -->
                         <div class="invoice-list" id="invoice-list">
                             <!-- Filled by JS -->
+                        </div>
+
+                        <!-- Empty state (shown by JS when no invoices due) -->
+                        <div class="invoice-empty-state" id="invoice-empty-state" hidden>
+                            <div class="invoice-empty-state__icon">🎉</div>
+                            <div class="invoice-empty-state__title">All Caught Up!</div>
+                            <p class="invoice-empty-state__sub">You have no outstanding invoices right now. We'll notify you when a new one is raised.</p>
                         </div>
 
                         <!-- Total Due -->

@@ -133,13 +133,37 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /* ══════════════════════════════════════════════════════
+       STEPPER MANAGER
+       ══════════════════════════════════════════════════════ */
+    const STEP_MAP = { 'pstep-0': 0, 'pstep-1': 1, 'pstep-2': 2, 'pstep-success': 2 };
+    function updateStepper(stepId) {
+        const activeIdx = STEP_MAP[stepId] ?? 0;
+        [0, 1, 2].forEach(i => {
+            const dot = document.getElementById(`step-dot-${i}`);
+            if (!dot) return;
+            dot.classList.remove('active', 'done');
+            if (i < activeIdx) dot.classList.add('done');
+            else if (i === activeIdx) dot.classList.add('active');
+        });
+        // Animate lines
+        document.querySelectorAll('.pay-stepper__line').forEach((line, i) => {
+            line.classList.toggle('done', i < activeIdx);
+        });
+        // Hide stepper on success
+        const stepper = document.getElementById('pay-stepper');
+        if (stepper) stepper.style.opacity = stepId === 'pstep-success' ? '0' : '1';
+    }
+
+    /* ══════════════════════════════════════════════════════
        STEP MANAGER
        ══════════════════════════════════════════════════════ */
     function goToStep(id) {
         document.querySelectorAll('.pstep').forEach(s => s.classList.remove('active'));
         const target = document.getElementById(id);
         if (target) { target.classList.add('active'); target.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
+        updateStepper(id);
     }
+
 
     /* ══════════════════════════════════════════════════════
        STEP 0 — CLIENT LOGIN
@@ -285,6 +309,36 @@ document.addEventListener('DOMContentLoaded', () => {
     function buildAccountView() {
         if (!currentClient) return;
 
+        /* ── Inject or update the logged-in header bar at top of step-1 card ── */
+        let loggedHeader = document.getElementById('client-logged-header');
+        const pstep1 = document.getElementById('pstep-1');
+        if (!loggedHeader && pstep1) {
+            loggedHeader = document.createElement('div');
+            loggedHeader.id = 'client-logged-header';
+            loggedHeader.className = 'client-logged-header';
+            pstep1.prepend(loggedHeader);
+        }
+        if (loggedHeader) {
+            const cname = currentClient.name || 'Client';
+            const cid = currentClient.id || '';
+            loggedHeader.innerHTML = `
+                <div class="client-logged-header__avatar">${cname.charAt(0).toUpperCase()}</div>
+                <div class="client-logged-header__info">
+                    <div class="client-logged-header__name">${cname}</div>
+                    <div class="client-logged-header__id">${cid}</div>
+                </div>
+                <button class="btn btn--sm btn--ghost client-logged-header__logout" id="logout-btn">Logout</button>
+            `;
+            document.getElementById('logout-btn')?.addEventListener('click', () => {
+                currentClient = null; selectedInvoice = null;
+                clientIdInput.value = ''; clientPassInput.value = '';
+                loginError.hidden = true;
+                localStorage.removeItem('synsite_active_client_id');
+                if (loggedHeader) loggedHeader.remove();
+                goToStep('pstep-0');
+            });
+        }
+
         /* Welcome bar (guarded if welcome bar is commented out) */
         const clientNameEl = document.getElementById('client-name');
         if (clientNameEl) clientNameEl.textContent = currentClient.name || 'Client';
@@ -330,15 +384,16 @@ document.addEventListener('DOMContentLoaded', () => {
         list.innerHTML = '';
 
         let totalDue = 0;
+        let dueCount = 0;
 
         if (currentClient.invoices) {
             currentClient.invoices.forEach((inv, idx) => {
                 const gst = inv.gst ? gstOf(inv.amount) : 0;
                 const total = inv.amount + gst;
-                totalDue += total;
+                if (inv.status !== 'paid') { totalDue += total; dueCount++; }
 
                 const card = document.createElement('div');
-                card.className = 'invoice-item glass-card';
+                card.className = `invoice-item glass-card${inv.status === 'due' ? ' invoice-item--due' : ''}`;
                 card.dataset.idx = idx;
                 card.innerHTML = `
                     <div class="invoice-item__left">
@@ -358,6 +413,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 list.appendChild(card);
             });
         }
+
+        // Show empty state if no due invoices
+        const emptyState = document.getElementById('invoice-empty-state');
+        if (emptyState) emptyState.hidden = dueCount > 0;
+        const totalDueRow = document.getElementById('total-due-row');
+        const proceedBtn = document.getElementById('proceed-to-pay-btn');
+        if (totalDueRow) totalDueRow.style.display = dueCount > 0 ? '' : 'none';
+        if (proceedBtn) proceedBtn.style.display = dueCount > 0 ? '' : 'none';
+
 
         /* Total */
         document.getElementById('total-due-amt').textContent = fmt(totalDue);
@@ -449,21 +513,25 @@ document.addEventListener('DOMContentLoaded', () => {
         const paise = total * 100;
 
         const btn = document.getElementById('pay-now-btn');
+        const payLabel = btn.querySelector('#pay-btn-label');
         btn.disabled = true;
-        btn.querySelector('#pay-btn-label').textContent = 'Creating order…';
+        btn.classList.add('btn--loading');
+        payLabel.textContent = 'Creating order…';
 
         const keyIsSet = RAZORPAY_KEY_ID && !RAZORPAY_KEY_ID.includes('PASTE_YOUR_KEY');
         if (!keyIsSet) {
             setTimeout(() => showKeyMissingAlert(total), 600);
             btn.disabled = false;
-            btn.querySelector('#pay-btn-label').textContent = `Pay ${fmt(total)} Now`;
+            btn.classList.remove('btn--loading');
+            payLabel.textContent = `Pay ${fmt(total)} Now`;
             return;
         }
 
         if (typeof window.Razorpay === 'undefined') {
             showToast('Razorpay SDK failed to load. Check your internet connection.');
             btn.disabled = false;
-            btn.querySelector('#pay-btn-label').textContent = `Pay ${fmt(total)} Now`;
+            btn.classList.remove('btn--loading');
+            payLabel.textContent = `Pay ${fmt(total)} Now`;
             return;
         }
 
@@ -567,7 +635,8 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error("Checkout error:", err);
             showToast(err.message || "Failed to initiate payment. Please try again.");
             btn.disabled = false;
-            btn.querySelector('#pay-btn-label').textContent = `Pay ${fmt(total)} Now`;
+            btn.classList.remove('btn--loading');
+            payLabel.textContent = `Pay ${fmt(total)} Now`;
         }
     });
 
