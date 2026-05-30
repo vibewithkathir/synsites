@@ -83,7 +83,9 @@ export const seed = mutation({
         .query("clients")
         .withIndex("by_clientId", (q) => q.eq("clientId", client.clientId))
         .unique();
-      if (!existing) {
+      if (existing) {
+        await ctx.db.patch(existing._id, client);
+      } else {
         await ctx.db.insert("clients", client);
       }
     }

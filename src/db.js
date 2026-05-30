@@ -28,7 +28,7 @@ export const DEFAULT_CLIENTS = {
         phone: '+91 98765 43210',
         description: 'Initial setup & integration of Synsite branding and structure.',
         invoices: [
-            { ref: 'INV-2026-0001', description: 'Demo Site Setup Dues', amount: 50, gst: false, status: 'due', dueDate: getNextMonth15Date() },
+            { ref: 'INV-2026-0001', description: 'Demo Site Setup Dues', amount: 100, gst: false, status: 'due', dueDate: getNextMonth15Date() },
         ],
     },
     'SYN-001': {
