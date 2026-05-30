@@ -21,7 +21,7 @@ export function getNextMonth15Date() {
 
 export const DEFAULT_CLIENTS = {
     'SYN-000': {
-        password: 'synsites-000',
+        password: 'synsites000',
         name: 'Kathir M',
         company: 'Synsites LLC',
         email: 'kathir@synsites.com',
@@ -32,7 +32,7 @@ export const DEFAULT_CLIENTS = {
         ],
     },
     'SYN-001': {
-        password: 'synsites-001',
+        password: 'synsites001',
         name: 'Rahul Mehta',
         company: 'NexGen Ventures',
         email: 'rahul@nexgen.com',
