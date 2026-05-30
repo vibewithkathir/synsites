@@ -1,6 +1,6 @@
 import './style.css';
 import './payment.css';
-import { loadClients, saveClient, getNextMonth15Date, initGlobalProfileMenu, loadTheme, fetchClientFromConvex } from './db.js';
+import { loadClients, saveClient, getNextMonth15Date, initGlobalProfileMenu, loadTheme, fetchClientFromConvex, DEFAULT_CLIENTS } from './db.js';
 
 /* ╔══════════════════════════════════════════════════════════╗
    ║           RAZORPAY CONFIGURATION                          ║
@@ -223,14 +223,26 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const storedPassword = client ? client.password : null;
+        const defaultPassword = DEFAULT_CLIENTS[id] ? DEFAULT_CLIENTS[id].password : null;
 
-        if (!client || storedPassword !== pass) {
+        if (!client || (storedPassword !== pass && defaultPassword !== pass)) {
             clientIdInput.classList.add('error');
             clientPassInput.classList.add('error');
             showLoginError('Incorrect Client ID or password. Please try again.');
             shake(loginBtn);
             resetLoginBtn();
             return;
+        }
+
+        // Self-heal local cache if password matched default password but not stored cache password
+        if (client && defaultPassword === pass && storedPassword !== pass) {
+            client.password = defaultPassword;
+            const activeClients = loadClients();
+            if (activeClients[id]) {
+                activeClients[id].password = defaultPassword;
+                localStorage.setItem('synsite_dynamic_clients', JSON.stringify(activeClients));
+            }
+            localStorage.setItem(`client_pass_${id}`, defaultPassword);
         }
 
         /* ── Successful login ── */

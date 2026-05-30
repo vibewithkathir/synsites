@@ -58,7 +58,17 @@ export function loadClients() {
             });
             // Overwrite/add dynamic ones
             Object.keys(parsed).forEach(id => {
-                merged[id] = parsed[id];
+                if (DEFAULT_CLIENTS[id]) {
+                    merged[id] = {
+                        ...DEFAULT_CLIENTS[id],
+                        ...parsed[id]
+                    };
+                    if (!parsed[id].password) {
+                        merged[id].password = DEFAULT_CLIENTS[id].password;
+                    }
+                } else {
+                    merged[id] = parsed[id];
+                }
             });
             return merged;
         } catch (e) {
