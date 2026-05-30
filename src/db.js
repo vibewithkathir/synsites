@@ -140,6 +140,21 @@ export async function syncConvex() {
         console.error("Convex sync failed:", e);
     }
 }
+
+export async function fetchClientFromConvex(clientId) {
+    if (!convexClient) return null;
+    try {
+        const client = await convexClient.query("clients:get", { clientId });
+        if (client) {
+            const { _id, _creationTime, ...clientData } = client;
+            return clientData;
+        }
+        return null;
+    } catch (e) {
+        console.error("Failed to fetch client from Convex:", e);
+        return null;
+    }
+}
 export function loadTheme() {
     const theme = localStorage.getItem('synsite_theme');
     if (theme === 'light') {

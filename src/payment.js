@@ -1,6 +1,6 @@
 import './style.css';
 import './payment.css';
-import { loadClients, saveClient, getNextMonth15Date, initGlobalProfileMenu, loadTheme } from './db.js';
+import { loadClients, saveClient, getNextMonth15Date, initGlobalProfileMenu, loadTheme, fetchClientFromConvex } from './db.js';
 
 /* ╔══════════════════════════════════════════════════════════╗
    ║           RAZORPAY CONFIGURATION                          ║
@@ -152,12 +152,38 @@ document.addEventListener('DOMContentLoaded', () => {
     const loginErrorMsg = document.getElementById('login-error-msg');
 
     /* Toggle password visibility */
-    document.getElementById('toggle-pass')?.addEventListener('click', () => {
+    const togglePassBtn = document.getElementById('toggle-pass');
+    togglePassBtn?.addEventListener('click', () => {
         const isPass = clientPassInput.type === 'password';
         clientPassInput.type = isPass ? 'text' : 'password';
+        
+        // Update eye icon SVG to show open or slashed eye
+        if (isPass) {
+            togglePassBtn.innerHTML = `
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" id="eye-icon">
+                    <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24M1 1l22 22" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+            `;
+            togglePassBtn.title = "Hide password";
+        } else {
+            togglePassBtn.innerHTML = `
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" id="eye-icon">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="1.5" />
+                    <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.5" />
+                </svg>
+            `;
+            togglePassBtn.title = "Show password";
+        }
     });
 
-    loginBtn?.addEventListener('click', () => {
+    const resetLoginBtn = () => {
+        if (loginBtn) {
+            loginBtn.disabled = false;
+            loginBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M15 12H3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Log In to My Account`;
+        }
+    };
+
+    loginBtn?.addEventListener('click', async () => {
         const id = clientIdInput.value.trim().toUpperCase();
         const pass = clientPassInput.value.trim();
 
@@ -168,14 +194,42 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!id) { clientIdInput.classList.add('error'); showLoginError('Please enter your Client ID.'); return; }
         if (!pass) { clientPassInput.classList.add('error'); showLoginError('Please enter your password.'); return; }
 
-        const activeClients = loadClients();
-        const client = activeClients[id];
-        const storedPassword = localStorage.getItem(`client_pass_${id}`) || (client ? client.password : null);
+        loginBtn.textContent = 'Verifying…';
+        loginBtn.disabled = true;
+
+        // Try to fetch fresh client data from Convex
+        let client = null;
+        try {
+            const dbClient = await fetchClientFromConvex(id);
+            if (dbClient) {
+                client = dbClient;
+                
+                // Update local storage cache
+                const activeClients = loadClients();
+                activeClients[id] = dbClient;
+                localStorage.setItem('synsite_dynamic_clients', JSON.stringify(activeClients));
+                if (dbClient.password) {
+                    localStorage.setItem(`client_pass_${id}`, dbClient.password);
+                }
+            }
+        } catch (e) {
+            console.error("Error checking credentials from Convex:", e);
+        }
+
+        // Fallback to local storage registry or DEFAULT_CLIENTS
+        if (!client) {
+            const activeClients = loadClients();
+            client = activeClients[id];
+        }
+
+        const storedPassword = client ? client.password : null;
+
         if (!client || storedPassword !== pass) {
             clientIdInput.classList.add('error');
             clientPassInput.classList.add('error');
             showLoginError('Incorrect Client ID or password. Please try again.');
             shake(loginBtn);
+            resetLoginBtn();
             return;
         }
 
@@ -190,8 +244,7 @@ document.addEventListener('DOMContentLoaded', () => {
         loginBtn.disabled = true;
 
         setTimeout(() => {
-            loginBtn.disabled = false;
-            loginBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M15 12H3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Log In to My Account`;
+            resetLoginBtn();
             buildAccountView();
             goToStep('pstep-1');
         }, 600);
