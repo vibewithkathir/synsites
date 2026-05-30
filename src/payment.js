@@ -98,9 +98,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const client = activeClients[savedClientId];
         if (client) {
             currentClient = { ...client, id: savedClientId };
-            currentClient.invoices.forEach(inv => {
-                inv.status = getInvoiceStatus(savedClientId, inv.ref, inv.status);
-            });
+            if (currentClient.invoices) {
+                currentClient.invoices.forEach(inv => {
+                    inv.status = getInvoiceStatus(savedClientId, inv.ref, inv.status);
+                });
+            }
             setTimeout(() => {
                 buildAccountView();
                 goToStep('pstep-1');
@@ -248,9 +250,11 @@ document.addEventListener('DOMContentLoaded', () => {
         /* ── Successful login ── */
         currentClient = { ...client, id };
         // Sync invoice status with localStorage
-        currentClient.invoices.forEach(inv => {
-            inv.status = getInvoiceStatus(id, inv.ref, inv.status);
-        });
+        if (currentClient.invoices) {
+            currentClient.invoices.forEach(inv => {
+                inv.status = getInvoiceStatus(id, inv.ref, inv.status);
+            });
+        }
         localStorage.setItem('synsite_active_client_id', id);
         loginBtn.textContent = 'Logging in…';
         loginBtn.disabled = true;
@@ -324,31 +328,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
         let totalDue = 0;
 
-        currentClient.invoices.forEach((inv, idx) => {
-            const gst = inv.gst ? gstOf(inv.amount) : 0;
-            const total = inv.amount + gst;
-            totalDue += total;
+        if (currentClient.invoices) {
+            currentClient.invoices.forEach((inv, idx) => {
+                const gst = inv.gst ? gstOf(inv.amount) : 0;
+                const total = inv.amount + gst;
+                totalDue += total;
 
-            const card = document.createElement('div');
-            card.className = 'invoice-item glass-card';
-            card.dataset.idx = idx;
-            card.innerHTML = `
-                <div class="invoice-item__left">
-                    <div class="invoice-item__ref">${inv.ref}</div>
-                    <div class="invoice-item__desc">${inv.description}</div>
-                    ${inv.dueDate ? `<div class="invoice-item__due-date" style="color: var(--c-purple-4); font-size: 0.78rem; font-weight: 600; margin-top: 4px;">📅 Due: ${inv.dueDate}</div>` : ''}
-                    <div class="invoice-item__breakdown">
-                        Base ${fmt(inv.amount)} ${inv.gst ? `+ GST ${fmt(gst)}` : '(No GST)'}
+                const card = document.createElement('div');
+                card.className = 'invoice-item glass-card';
+                card.dataset.idx = idx;
+                card.innerHTML = `
+                    <div class="invoice-item__left">
+                        <div class="invoice-item__ref">${inv.ref}</div>
+                        <div class="invoice-item__desc">${inv.description}</div>
+                        ${inv.dueDate ? `<div class="invoice-item__due-date" style="color: var(--c-purple-4); font-size: 0.78rem; font-weight: 600; margin-top: 4px;">📅 Due: ${inv.dueDate}</div>` : ''}
+                        <div class="invoice-item__breakdown">
+                            Base ${fmt(inv.amount)} ${inv.gst ? `+ GST ${fmt(gst)}` : '(No GST)'}
+                        </div>
                     </div>
-                </div>
-                <div class="invoice-item__right">
-                    <div class="invoice-item__total">${fmt(total)}</div>
-                    <span class="invoice-status invoice-status--${inv.status}">${inv.status === 'due' ? 'Due' : 'Paid'}</span>
-                    ${inv.status === 'due' ? `<button class="btn btn--sm btn--primary pay-this-btn" data-idx="${idx}">Pay Now</button>` : '<span class="paid-badge">✓ Paid</span>'}
-                </div>
-            `;
-            list.appendChild(card);
-        });
+                    <div class="invoice-item__right">
+                        <div class="invoice-item__total">${fmt(total)}</div>
+                        <span class="invoice-status invoice-status--${inv.status}">${inv.status === 'due' ? 'Due' : 'Paid'}</span>
+                        ${inv.status === 'due' ? `<button class="btn btn--sm btn--primary pay-this-btn" data-idx="${idx}">Pay Now</button>` : '<span class="paid-badge">✓ Paid</span>'}
+                    </div>
+                `;
+                list.appendChild(card);
+            });
+        }
 
         /* Total */
         document.getElementById('total-due-amt').textContent = fmt(totalDue);

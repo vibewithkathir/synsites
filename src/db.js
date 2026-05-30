@@ -206,16 +206,18 @@ export function initGlobalProfileMenu(forceRefresh = false) {
     if (!client) return;
 
     // Sync status with localStorage
-    client.invoices.forEach(inv => {
-        const paidList = localStorage.getItem(`client_paid_${activeId}`);
-        if (paidList) {
-            const parsed = JSON.parse(paidList);
-            if (parsed.includes(inv.ref)) inv.status = 'paid';
-        }
-    });
+    if (client.invoices) {
+        client.invoices.forEach(inv => {
+            const paidList = localStorage.getItem(`client_paid_${activeId}`);
+            if (paidList) {
+                const parsed = JSON.parse(paidList);
+                if (parsed.includes(inv.ref)) inv.status = 'paid';
+            }
+        });
+    }
 
     // Count outstanding dues
-    const dueInvoices = client.invoices.filter(i => i.status === 'due');
+    const dueInvoices = (client.invoices || []).filter(i => i.status === 'due');
     const hasDues = dueInvoices.length > 0;
     
     // Hide standard desktop CTA buttons in navbar if logged in
@@ -287,7 +289,8 @@ export function initGlobalProfileMenu(forceRefresh = false) {
     profileDiv.id = 'nav-profile-container';
     profileDiv.style.cssText = `position: relative; display: flex; align-items: center; gap: 8px; z-index: 1000; margin-left: auto; margin-right: 0.5rem;`;
     
-    const avatarLetter = client.name.charAt(0).toUpperCase();
+    const clientName = client.name || 'Client';
+    const avatarLetter = clientName.charAt(0).toUpperCase();
 
     profileDiv.innerHTML = `
         <button id="nav-avatar-btn" style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--c-purple-2), var(--c-cyan)); border: 2px solid rgba(245, 245, 220, 0.4); display: flex; align-items: center; justify-content: center; font-size: 1rem; color: #fff; font-weight: 700; cursor: pointer; position: relative; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)';" onmouseout="this.style.transform='scale(1)';">
@@ -298,7 +301,7 @@ export function initGlobalProfileMenu(forceRefresh = false) {
         <!-- Dropdown Menu -->
         <div id="nav-profile-dropdown" class="glass" style="display: none; position: absolute; top: 50px; right: 0; width: 260px; padding: 1.25rem; border-radius: var(--r-md); border: 1px solid rgba(245, 245, 220, 0.2); box-shadow: 0 16px 48px rgba(0,0,0,0.6); animation: fade-in-up 0.25s ease;">
             <div style="margin-bottom: 0.75rem; padding-bottom: 0.75rem; border-bottom: 1px dashed rgba(255,255,255,0.1);">
-                <div style="font-weight: 700; color: #fff; font-size: 0.92rem; text-align: left;">${client.name}</div>
+                <div style="font-weight: 700; color: #fff; font-size: 0.92rem; text-align: left;">${clientName}</div>
                 <div style="font-size: 0.75rem; color: var(--c-gray-3); margin-top: 2px; text-align: left;">ID: ${activeId}</div>
                 ${hasDues ? `<div style="font-size: 0.75rem; color: #fca5a5; margin-top: 4px; font-weight: 600; text-align: left;">⚠️ Outstanding: ${dueInvoices.length} invoice(s)</div>` : `<div style="font-size: 0.75rem; color: #86efac; margin-top: 4px; text-align: left;">✓ Dues fully paid</div>`}
             </div>
