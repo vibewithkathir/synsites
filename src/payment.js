@@ -10,7 +10,8 @@ import { loadClients, saveClient, getNextMonth15Date, initGlobalProfileMenu, loa
    ║  Test key format:  rzp_test_XXXXXXXXXXXXXXXX             ║
    ║  Live key format:  rzp_live_XXXXXXXXXXXXXXXX             ║
    ╚══════════════════════════════════════════════════════════╝ */
-const RAZORPAY_KEY_ID = 'rzp_test_St5tB4HHy2vWMd';
+const RAZORPAY_KEY_ID = import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_St5tB4HHy2vWMd';
+const CONVEX_SITE_URL = import.meta.env.VITE_CONVEX_SITE_URL;
 
 const CONFIG = {
     companyName: 'Synsite',
@@ -359,7 +360,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('back-to-1')?.addEventListener('click', () => goToStep('pstep-1'));
 
     /* Pay Now → Razorpay */
-    document.getElementById('pay-now-btn')?.addEventListener('click', () => {
+    document.getElementById('pay-now-btn')?.addEventListener('click', async () => {
         if (!selectedInvoice) return;
 
         const email = document.getElementById('cust-email')?.value.trim();
@@ -375,8 +376,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const btn = document.getElementById('pay-now-btn');
         btn.disabled = true;
-        btn.querySelector('#pay-btn-label').textContent = 'Opening Razorpay…';
+        btn.querySelector('#pay-btn-label').textContent = 'Creating order…';
 
+        const keyIsSet = RAZORPAY_KEY_ID && !RAZORPAY_KEY_ID.includes('PASTE_YOUR_KEY');
         if (!keyIsSet) {
             setTimeout(() => showKeyMissingAlert(total), 600);
             btn.disabled = false;
@@ -391,34 +393,108 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        const options = {
-            key: RAZORPAY_KEY_ID,
-            amount: paise,
-            currency: CONFIG.currency,
-            name: CONFIG.companyName,
-            description: selectedInvoice.description,
-            image: CONFIG.companyLogo || undefined,
-            prefill: { name: currentClient?.name || '', email, contact: phone },
-            notes: { client_id: currentClient?.id || '', invoice_ref: selectedInvoice.ref },
-            theme: { color: CONFIG.theme },
-            handler: function (response) {
-                markInvoicePaid();
-                showSuccessStep({
-                    paymentId: response.razorpay_payment_id,
-                    email, total, gst, base,
-                    desc: selectedInvoice.description,
-                    ref: selectedInvoice.ref,
-                });
-            },
-            modal: {
-                ondismiss: () => {
-                    btn.disabled = false;
-                    btn.querySelector('#pay-btn-label').textContent = `Pay ${fmt(total)} Now`;
+        try {
+            // Step 1: Create secure order on backend (Convex HTTP action)
+            const siteUrl = CONVEX_SITE_URL || window.location.origin;
+            const orderRes = await fetch(`${siteUrl}/api/create-order`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
                 },
-            },
-        };
+                body: JSON.stringify({
+                    amount: paise,
+                    currency: CONFIG.currency,
+                    receipt: selectedInvoice.ref
+                })
+            });
 
-        new window.Razorpay(options).open();
+            if (!orderRes.ok) {
+                const orderErr = await orderRes.json();
+                throw new Error(orderErr.error || "Failed to create order on server");
+            }
+
+            const orderData = await orderRes.json();
+
+            // Step 2: Open Razorpay modal with orderData.order_id
+            btn.querySelector('#pay-btn-label').textContent = 'Opening Razorpay…';
+
+            const options = {
+                key: RAZORPAY_KEY_ID,
+                amount: orderData.amount,
+                currency: orderData.currency,
+                name: CONFIG.companyName,
+                description: selectedInvoice.description,
+                image: CONFIG.companyLogo || undefined,
+                order_id: orderData.order_id,
+                prefill: { name: currentClient?.name || '', email, contact: phone },
+                notes: { client_id: currentClient?.id || '', invoice_ref: selectedInvoice.ref },
+                theme: { color: CONFIG.theme },
+                handler: async function (response) {
+                    try {
+                        btn.querySelector('#pay-btn-label').textContent = 'Verifying payment…';
+                        btn.disabled = true;
+
+                        // Step 3: Verify signature on backend
+                        const verifyRes = await fetch(`${siteUrl}/api/verify-payment`, {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({
+                                razorpay_order_id: response.razorpay_order_id,
+                                razorpay_payment_id: response.razorpay_payment_id,
+                                razorpay_signature: response.razorpay_signature
+                            })
+                        });
+
+                        if (!verifyRes.ok) {
+                            const verifyErr = await verifyRes.json();
+                            throw new Error(verifyErr.error || "Payment signature verification failed");
+                        }
+
+                        const verifyData = await verifyRes.json();
+                        if (!verifyData.success) {
+                            throw new Error("Payment signature verification failed");
+                        }
+
+                        markInvoicePaid();
+                        showSuccessStep({
+                            paymentId: response.razorpay_payment_id,
+                            email, total, gst, base,
+                            desc: selectedInvoice.description,
+                            ref: selectedInvoice.ref,
+                        });
+                    } catch (verifyErr) {
+                        console.error("Verification error:", verifyErr);
+                        showToast(verifyErr.message || "Signature verification failed. Payment was not recorded.");
+                    } finally {
+                        btn.disabled = false;
+                        btn.querySelector('#pay-btn-label').textContent = `Pay ${fmt(total)} Now`;
+                    }
+                },
+                modal: {
+                    ondismiss: () => {
+                        btn.disabled = false;
+                        btn.querySelector('#pay-btn-label').textContent = `Pay ${fmt(total)} Now`;
+                    },
+                },
+            };
+
+            const rzp = new window.Razorpay(options);
+            
+            rzp.on('payment.failed', function (resp) {
+                console.error("Payment failed:", resp.error);
+                showToast(`Payment failed: ${resp.error.description || "Unknown error"}`);
+            });
+
+            rzp.open();
+
+        } catch (err) {
+            console.error("Checkout error:", err);
+            showToast(err.message || "Failed to initiate payment. Please try again.");
+            btn.disabled = false;
+            btn.querySelector('#pay-btn-label').textContent = `Pay ${fmt(total)} Now`;
+        }
     });
 
     /* ══════════════════════════════════════════════════════
